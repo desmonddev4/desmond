@@ -24,7 +24,7 @@ Get the **Web API key** from your Firebase project settings. In Vercel, add `NST
 The web API key is necessarily visible in the deployed browser code; it is not an admin password. Database access is controlled by the published Firebase rules. After deploying, open `admin/login.html`, sign in, and keep the inbox tab open when you want to be reachable.
 
 ## Adding projects from the admin
-Open `admin/projects.html` and press **Add project**. Fill in the name, category, a short description and a cover image (it is resized in your browser), then save. The project appears at once in the home page carousel, the Work page and on its own case study page. The case study fields (client, role, tech, brief, what you built, result) are optional. You can edit or delete anything you added; the 8 built-in samples in `js/data.js` stay as they are.
+Open `admin/projects.html` and press **Add project**. Fill in the name, category, a short description and a cover image (it is resized in your browser), then save. The project appears at once in the home page carousel, the Work page and on its own case study page. The case study fields (client, role, tech, brief, what you built, result) are optional. The portfolio starts empty; you can edit or delete the projects you add here.
 - **Live mode:** projects are saved in your Firebase database under `projects` and `projectImgs`. You must **re-publish `firebase-rules.json`** (Realtime Database > Rules) once, because it now includes those two paths. Everyone can read them, only your verified email can write.
 - **Demo mode:** projects are saved in the same browser as the admin, which is enough to try it out.
 

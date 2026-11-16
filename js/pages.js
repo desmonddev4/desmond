@@ -20,6 +20,12 @@
     let active = 'All';
     const draw = () => {
       const W = window.WORKS || [], tags = [...new Set(W.map(w => w.tag))];
+      if (!W.length) {
+        fl.hidden = true;
+        grid.innerHTML = '<p class="project-empty">Projects are on the way. Please check back soon.</p>';
+        return;
+      }
+      fl.hidden = false;
       if (active !== 'All' && !tags.includes(active)) active = 'All';
       grid.innerHTML = W.map((w, i) => `<article class="pc rv in${active === 'All' || w.tag === active ? '' : ' gone'}" data-t="${esc(w.tag)}" data-i="${i}" tabindex="0" role="button" aria-label="View ${esc(w.t)} full size"><div class="shot"><img src="${esc(imgOf(w))}" alt="${esc(w.t)}" loading="lazy"></div><div class="meta"><h3>${esc(w.t)}</h3><span class="tg">${esc(w.tag)}</span></div><p>${esc(w.d)} <a class="more" href="project.html?id=${encodeURIComponent(w.id)}">Read case study</a></p></article>`).join('');
       fl.innerHTML = ['All', ...tags].map(t => `<button class="f${t === active ? ' on' : ''}" data-f="${esc(t)}">${esc(t)}</button>`).join('');

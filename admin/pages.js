@@ -3,8 +3,7 @@
   const pages = {};
   const W = () => window.WORKS || [];
   const PROJ = ['Planned', 'Building', 'Shipped'];
-  const projState = () => { const m = ADM_ls('nst_admin_projects', {}); return w => w.custom ? (w.status || 'Shipped') : (m[w.id] || (w.id < 2 ? 'Shipped' : 'Planned')) };
-  const ADM_ls = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch { return d } };
+  const projState = () => w => w.status || 'Shipped';
 
   /* ============ Overview ============ */
   let ovRange = 7;
@@ -204,13 +203,12 @@
     const P = window.NSTProjects, ps = projState(), tags = ['All', ...new Set(W().map(w => w.tag))];
     const set = async (w, st) => {
       try {
-        if (w.custom) { const r = await P.raw(w.id); await P.save(w.id, { ...r, status: st }) }
-        else { const m = ADM_ls('nst_admin_projects', {}); m[w.id] = st; x.lsSet('nst_admin_projects', m); x.repaint() }
+        const r = await P.raw(w.id); await P.save(w.id, { ...r, status: st });
         x.toast(`${w.t.split(':')[0]} marked ${st.toLowerCase()}`);
       } catch { x.toast('Could not change the status') }
     };
     const by = k => W().filter(w => ps(w) === k).length, tagRows = tags.slice(1).map(t => ({ label: t, value: W().filter(w => w.tag === t).length }));
-    const mine = W().filter(w => w.custom).length;
+    const mine = W().length;
     v.innerHTML = `
     <div class="ph"><div><h2>Projects</h2><p>Add the work you want visitors to see. Projects you add show up in your Work section, on the home page and as their own case study page. ${P.live ? '' : 'Demo mode: they are saved in this browser until you connect Firebase.'}</p></div><div class="acts"><button class="pb fill" id="padd" type="button"><span class="pi sv">${x.ic.plus}</span><span>Add project</span></button><a class="pb lt" href="../work.html"><span class="pi">${x.png('work')}</span><span>Open Work page</span></a></div></div>
     <div class="grid">
@@ -219,13 +217,13 @@
       <article class="card st s3"><span class="ti" style="background:linear-gradient(135deg,#f0a020,#ffd37a);box-shadow:0 14px 24px -10px #f0a020">${x.ic.bolt}</span><span class="lb">Building</span><span class="nm" data-n="${by('Building')}">0</span><span class="nt">In progress</span></article>
       <article class="card st s3"><span class="ti" style="background:linear-gradient(135deg,#6e93ff,#3bb3ff);box-shadow:0 14px 24px -10px #3bb3ff">${x.ic.clock}</span><span class="lb">Planned</span><span class="nm" data-n="${by('Planned')}">0</span><span class="nt">Up next</span></article>
       <article class="card s4"><div class="ch"><div><h3>By category</h3><small>Projects per tag</small></div></div><div id="tg"></div></article>
-      <article class="card s8"><div class="ch"><div><h3>Browse</h3><small>${W().length} projects</small></div><div class="fl" id="ptag">${tags.map(t => `<button class="f${t === pjTag ? ' on' : ''}" data-t="${x.esc(t)}" type="button">${x.esc(t)}</button>`).join('')}</div></div><p style="color:var(--soft);font-size:14px">Filter by category, then change a project’s status with the switch on its card. Projects you add can be edited or removed. The built-in samples are edited in <b>js/data.js</b>.</p></article>
+      <article class="card s8"><div class="ch"><div><h3>Browse</h3><small>${W().length} projects</small></div><div class="fl" id="ptag">${tags.map(t => `<button class="f${t === pjTag ? ' on' : ''}" data-t="${x.esc(t)}" type="button">${x.esc(t)}</button>`).join('')}</div></div><p style="color:var(--soft);font-size:14px">Filter by category, then change a project’s status with the switch on its card. All listed projects are managed here and can be edited or removed.</p></article>
     </div>
     <div class="grid" id="pg"></div>`;
     x.bars(x.$('#tg', v), tagRows);
     const pg = x.$('#pg', v), list = W().filter(w => pjTag === 'All' || w.tag === pjTag);
     const add = `<button class="card pj s4 pj-add" id="padd2" type="button"><span class="plus">${x.ic.plus}</span><b>Add a project</b><small>Upload a screenshot, write a short description and it goes live on your site.</small></button>`;
-    pg.innerHTML = add + list.map(w => `<article class="card pj s4" data-id="${x.esc(w.id)}"><div class="shot"><img src="${x.esc(P.imgAdmin(w))}" alt="" loading="lazy"><span class="chip">${x.esc(w.tag)}</span>${w.custom ? '' : '<span class="chip n rt">Sample</span>'}</div><div class="bd2"><h3>${x.esc(w.t)}</h3><p>${x.esc(w.d)}</p><div class="meta">${(w.stack || []).map(s => `<span class="chip w">${x.esc(s)}</span>`).join('')}<span class="chip n">${x.esc(w.year)}</span></div><div class="bar"><div class="seg">${PROJ.map(p => `<button class="${ps(w) === p ? 'on' : ''}" type="button">${p}</button>`).join('')}</div><span class="rowb">${w.custom ? `<button class="pb lt sm" data-edit type="button" aria-label="Edit ${x.esc(w.t)}"><span class="pi sv">${x.ic.edit}</span><span>Edit</span></button><button class="pb lt sm dng" data-del type="button" aria-label="Delete ${x.esc(w.t)}"><span class="pi sv">${x.ic.trash}</span></button>` : ''}<a class="pb lt sm" href="../project.html?id=${encodeURIComponent(w.id)}"><span class="pi sv">${x.ic.eye}</span><span>View</span></a></span></div></div></article>`).join('');
+    pg.innerHTML = add + list.map(w => `<article class="card pj s4" data-id="${x.esc(w.id)}"><div class="shot"><img src="${x.esc(P.imgAdmin(w))}" alt="" loading="lazy"><span class="chip">${x.esc(w.tag)}</span></div><div class="bd2"><h3>${x.esc(w.t)}</h3><p>${x.esc(w.d)}</p><div class="meta">${(w.stack || []).map(s => `<span class="chip w">${x.esc(s)}</span>`).join('')}<span class="chip n">${x.esc(w.year)}</span></div><div class="bar"><div class="seg">${PROJ.map(p => `<button class="${ps(w) === p ? 'on' : ''}" type="button">${p}</button>`).join('')}</div><span class="rowb"><button class="pb lt sm" data-edit type="button" aria-label="Edit ${x.esc(w.t)}"><span class="pi sv">${x.ic.edit}</span><span>Edit</span></button><button class="pb lt sm dng" data-del type="button" aria-label="Delete ${x.esc(w.t)}"><span class="pi sv">${x.ic.trash}</span></button><a class="pb lt sm" href="../project.html?id=${encodeURIComponent(w.id)}"><span class="pi sv">${x.ic.eye}</span><span>View</span></a></span></div></div></article>`).join('');
     x.stagger(v);
     const openAdd = () => projectForm(x, null);
     x.$('#padd', v).addEventListener('click', openAdd); x.$('#padd2', v).addEventListener('click', openAdd);

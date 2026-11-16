@@ -113,16 +113,21 @@
       c.style.transform = `translateX(calc(-50% + ${o * step}px)) translateY(${a * 22}px) scale(${s}) rotateY(${o * -5}deg)`;
       const lim = narrow ? 1 : 2; c.style.opacity = a > lim ? 0 : 1 - a * .3; c.style.zIndex = 10 - a; c.style.pointerEvents = a > lim ? 'none' : 'auto'; c.style.filter = a ? `brightness(${1 - a * .18})` : 'none'; c.classList.toggle('act', !a) });
     [...dots.children].forEach((b, i) => b.classList.toggle('on', i === cur2)) };
-  const go = i => { cur2 = Math.max(0, Math.min(cards.length - 1, i)); place() };
+  const go = i => { if (!cards.length) return; cur2 = Math.max(0, Math.min(cards.length - 1, i)); place() };
   const buildRail = () => {
     rail.textContent = ''; dots.textContent = ''; const W = window.WORKS || [];
+    if (!W.length) {
+      const empty = document.createElement('p'); empty.className = 'project-empty rail-empty'; empty.textContent = 'Projects are on the way. Check back soon.';
+      rail.appendChild(empty); cards = []; return;
+    }
+    rail.innerHTML = '<button class="arrow l" aria-label="Previous">&#8249;</button><button class="arrow r" aria-label="Next">&#8250;</button>';
+    $('.arrow.l', rail).onclick = () => go(cur2 - 1); $('.arrow.r', rail).onclick = () => go(cur2 + 1);
     cards = W.map((w, i) => { const d = document.createElement('article'); d.className = 'wc';
       d.innerHTML = `<div class="shot"><img src="${esc(imgOf(w))}" alt="${esc(w.t)}" loading="lazy"><span class="tag">${esc(w.tag)}</span></div><h3>${esc(w.t)}</h3><p>${esc(w.d)}</p><div class="row"><span>${esc(w.year || '2026')}</span><a class="btn" href="project.html?id=${encodeURIComponent(w.id)}">View project</a></div>`;
       d.addEventListener('click', () => go(i)); rail.appendChild(d);
       const b = document.createElement('button'); b.setAttribute('aria-label', 'Project ' + (i + 1)); b.onclick = () => go(i); dots.appendChild(b); return d });
     cur2 = Math.max(0, Math.min(cards.length - 1, cur2)); place();
   };
-  $('.arrow.l').onclick = () => go(cur2 - 1); $('.arrow.r').onclick = () => go(cur2 + 1);
   let sx = null; rail.addEventListener('pointerdown', e => sx = e.clientX);
   addEventListener('pointerup', e => { if (sx !== null && Math.abs(e.clientX - sx) > 50) go(cur2 + (e.clientX < sx ? 1 : -1)); sx = null });
   addEventListener('resize', place); buildRail(); document.addEventListener('nst:projects', buildRail);

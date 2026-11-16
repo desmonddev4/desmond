@@ -127,6 +127,8 @@ a{color:inherit;text-decoration:none}
 .works h2{font-size:clamp(44px,6vw,92px)}
 .works .head p{color:var(--mute);margin-top:12px;font-size:15px}
 .rail{position:relative;height:540px;max-width:1300px;margin:0 auto;touch-action:pan-y}
+.rail-empty{position:absolute;inset:0;display:grid;place-items:center}
+.project-empty{grid-column:1/-1;color:var(--soft);text-align:center;padding:48px 20px}
 .wc{position:absolute;left:50%;top:0;width:min(620px,80vw);border-radius:26px;padding:12px;background:linear-gradient(170deg,#18246b,#0c1440);border:1px solid #ffffff1c;display:flex;flex-direction:column;transition:transform .8s var(--ease),opacity .6s,filter .6s;cursor:pointer;user-select:none;will-change:transform}
 .wc .shot{aspect-ratio:1000/504;border-radius:16px;overflow:hidden;position:relative;background:#050816}
 .wc .shot img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}

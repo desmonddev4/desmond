@@ -1,7 +1,6 @@
 /* projects.js: one place for the portfolio's projects.
-   - Built-in projects live in data.js (window.WORKS) and are never changed here.
    - Projects added from the admin are stored in Firebase (live) or localStorage (demo),
-     then merged into window.WORKS so every page (home, work, case study) shows them.
+     then loaded into window.WORKS so every page (home, work, case study) shows them.
    Load order: data.js, chat-config.js, chat-core.js, projects.js, then the page scripts.
    Pages that draw projects should draw once now and again on the 'nst:projects' event. */
 (() => {
@@ -10,7 +9,6 @@
   const db = (fb.databaseURL || '').replace(/\/+$/, '');
   const live = !!(db && fb.apiKey);
   const KEY = 'nst_projects_v1', CACHE = 'nst_projects_cache', IMGS = 'nst_project_imgs_v1';
-  const builtin = (window.WORKS || []).map(w => ({ ...w, builtin: true }));
   const rd = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch { return d } };
   const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true } catch { return false } };
 
@@ -27,9 +25,9 @@
   });
   const fromTree = tree => Object.entries(tree || {}).map(([id, r]) => shape(id, r || {})).sort((a, b) => b.created - a.created);
 
-  /* ---------- build window.WORKS = custom first, then built-ins ---------- */
+  /* ---------- build window.WORKS from admin-managed projects ---------- */
   const merge = () => {
-    const all = [...custom, ...builtin.map((w, i) => ({ ...w, id: i }))];
+    const all = [...custom];
     window.WORKS = all; window.NSTProjects.list = all;
     listeners.forEach(f => { try { f(all) } catch {} });
     document.dispatchEvent(new CustomEvent('nst:projects', { detail: all }));

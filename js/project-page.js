@@ -4,7 +4,18 @@ const want=new URLSearchParams(location.search).get('id')||'0';
 const safeLink=u=>/^https?:\/\//i.test(u||'')?u:'';
 let shown=null;
 const draw=()=>{
-  const W=window.WORKS||[];let id=W.findIndex(w=>String(w.id)===want);
+  const W=window.WORKS||[];
+  if(!W.length){
+    if(NSTProjects.live&&!shown)return;
+    if(shown!=='empty'){
+      shown='empty';document.title='Projects | Desmond Amedzie';
+      $('#pt').textContent='Projects coming soon';$('#pd').textContent='New project case studies will appear here once they are added.';
+      $('.sec').hidden=true;
+    }
+    return;
+  }
+  if(shown==='empty'){shown=null;$('.sec').hidden=false}
+  let id=W.findIndex(w=>String(w.id)===want);
   if(id<0){ if(!NSTProjects.live||!/^p/.test(want)||shown==='miss'){ id=0 } else { return } }   // custom project not loaded yet: wait for the next nst:projects
   const w=W[id]; if(!w) return; shown=String(w.id);
   document.title=w.t+' | Desmond Amedzie';$('#pt').textContent=w.t;$('#pd').textContent=w.d;
