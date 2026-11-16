@@ -12,7 +12,7 @@ Until you do this, the chat runs in **demo mode** (messages stay in the same bro
 ## 2. Turn on sign-in for you only
 1. **Build > Authentication > Get started > Email/Password > Enable**.
 2. **Users > Add user**: email `damedzie4@gmail.com` and a strong password.
-3. Firebase marks admin-created users as unverified. Rules require a verified email, so verify it: in **Users**, open the menu on your row and choose **Send verification email** (or reset password), then click the link.
+3. Firebase marks admin-created users as unverified. Rules require a verified email. After deploying the site, open `admin/login.html` and try signing in with the account. The site sends a verification email automatically; open the link in your inbox (check spam too), then sign in again. A password-reset link does not verify the email.
 
 ## 3. Paste the rules
 **Realtime Database > Rules**: replace everything with the contents of `firebase-rules.json` and **Publish**.

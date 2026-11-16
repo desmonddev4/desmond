@@ -13,7 +13,7 @@ For Vercel, add `NST_FIREBASE_DATABASE_URL` and `NST_FIREBASE_API_KEY` in **Proj
 Paste `firebase-rules.json` into Realtime Database > Rules and publish. **The rules are the real lock**: the sign-in page is a convenience, the rules are what stop anyone else reading your inbox or editing projects. Check that your email in the rules matches `owner.email` in `js/chat-config.js`.
 
 ## 3. Verify your admin email (required)
-Rules need a verified email. In Firebase Authentication > Users use **Send verification email** (or use *Forgot password?* on the login page; opening the link also verifies it). Use a long unique password.
+Rules need a verified email. After deploying, try signing in at `admin/login.html`; the site automatically sends a verification email for an unverified admin. Open that link, then sign in again. A password-reset link does not verify the email. Use a long, unique password.
 
 ## 4. Firebase web key visibility
 The Firebase web API key is included in the deployed JavaScript because browser code needs it. Storing it as a Vercel environment variable keeps it out of Git-tracked source, but does not make it secret after deployment. Firebase database rules—not the key—protect chat and project data.

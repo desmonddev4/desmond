@@ -98,8 +98,18 @@
       // Only the owner account may use the admin. Anyone else is signed straight back out.
       const c = jwt(d.idToken);
       if (OWNER && String(c.email || '').toLowerCase() !== OWNER) throw new Error('NOT_OWNER');
+      if (c.email_verified !== true) {
+        const verification = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: d.idToken })
+        });
+        const result = await verification.json();
+        if (!verification.ok) throw new Error('VERIFY_EMAIL:' + ((result.error && result.error.message) || 'FAILED'));
+        return { verified: false, verificationSent: true };
+      }
       applyToken(d.idToken, d.refreshToken, d.expiresIn, remember !== false);
-      return { verified: c.email_verified === true };
+      return { verified: true };
     },
     async reset(email) {
       const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestType: 'PASSWORD_RESET', email }) });

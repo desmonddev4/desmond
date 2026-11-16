@@ -61,8 +61,10 @@
     if (/INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|EMAIL_NOT_FOUND|INVALID_EMAIL|MISSING_PASSWORD/.test(m)) return 'Wrong email or password.';
     if (/NOT_OWNER/.test(m)) return 'That account does not have admin access.';
     if (/TOO_MANY_ATTEMPTS/.test(m)) return 'Too many attempts. Wait a few minutes or reset your password.';
+    if (/VERIFY_EMAIL:TOO_MANY_ATTEMPTS_TRY_LATER/.test(m)) return 'Too many verification emails were requested. Wait a while, then try signing in again.';
+    if (/VERIFY_EMAIL:/.test(m)) return 'Could not send the verification email. Check your Vercel Firebase environment variables and try again.';
     if (/USER_DISABLED/.test(m)) return 'This account has been disabled.';
-    if (/API_KEY|API key/.test(m)) return 'The site\'s Firebase API key is not valid. Check js/chat-config.js.';
+    if (/API_KEY|API key/.test(m)) return 'The site\'s Firebase API key is not valid. Check the Vercel environment variables.';
     if (/NOT_CONFIGURED/.test(m)) return 'The admin is not set up on this site yet.';
     if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Could not reach the server. Check your connection and try again.';
     return 'Could not sign in. Please try again.';
@@ -78,7 +80,7 @@
     busy(go, true);
     try {
       const r = await A.login(email, pass, $('#keep').checked);
-      if (C.live && r && r.verified === false) { A.logout(); busy(go, false); return fail('Your email is not verified yet. Use "Forgot password?" to get a link; opening it verifies the address.') }
+      if (C.live && r && r.verified === false) { A.logout(); busy(go, false); return fail('Verification email sent. Check your inbox and spam folder, open the verification link, then sign in again.') }
       saveLock({ n: 0, until: 0 });
       go.querySelector('span').textContent = 'Welcome back';
       enter();
