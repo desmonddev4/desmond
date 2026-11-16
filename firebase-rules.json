@@ -1,0 +1,129 @@
+{
+  "rules": {
+    "owner": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true"
+    },
+    "chatIndex": {
+      ".read": "auth != null && auth.token.email == 'damedzie4@gmail.com'",
+      "$cid": {
+        ".write": "$cid.length >= 16 && $cid.length <= 40",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "email": {
+          ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 120)"
+        },
+        "topic": {
+          ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 40)"
+        },
+        "lastText": {
+          ".validate": "newData.isString() && newData.val().length <= 140"
+        },
+        "lastFrom": {
+          ".validate": "newData.val() == 'v' || newData.val() == 'a'"
+        },
+        "lastAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "chats": {
+      "$cid": {
+        ".read": "$cid.length >= 16 && $cid.length <= 40",
+        ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true",
+        "msgs": {
+          "$k": {
+            ".write": "$cid.length >= 16 && $cid.length <= 40 && !data.exists()",
+            ".validate": "newData.hasChildren(['from','text','ts'])",
+            "from": {
+              ".validate": "newData.val() == 'v' || (newData.val() == 'a' && auth != null && auth.token.email == 'damedzie4@gmail.com')"
+            },
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
+            },
+            "ts": {
+              ".validate": "newData.val() == now"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "typing": {
+          "$r": {
+            ".write": "$cid.length >= 16 && $cid.length <= 40",
+            ".validate": "($r == 'v' || $r == 'a') && newData.val() == now"
+          }
+        }
+      }
+    },
+    "projects": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true",
+      "$id": {
+        ".validate": "newData.hasChildren(['t','tag','d','thumb'])",
+        "t": {
+          ".validate": "newData.isString() && newData.val().length <= 90"
+        },
+        "tag": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "d": {
+          ".validate": "newData.isString() && newData.val().length <= 180"
+        },
+        "thumb": {
+          ".validate": "newData.isString() && newData.val().length <= 400000"
+        },
+        "img": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "live": {
+          ".validate": "newData.isString() && newData.val().length <= 300"
+        },
+        "client": {
+          ".validate": "newData.isString() && newData.val().length <= 90"
+        },
+        "role": {
+          ".validate": "newData.isString() && newData.val().length <= 90"
+        },
+        "year": {
+          ".validate": "newData.isString() && newData.val().length <= 9"
+        },
+        "brief": {
+          ".validate": "newData.isString() && newData.val().length <= 700"
+        },
+        "built": {
+          ".validate": "newData.isString() && newData.val().length <= 700"
+        },
+        "result": {
+          ".validate": "newData.isString() && newData.val().length <= 500"
+        },
+        "status": {
+          ".validate": "newData.val() == 'Planned' || newData.val() == 'Building' || newData.val() == 'Shipped'"
+        },
+        "stack": {
+          "$i": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          }
+        },
+        "created": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "projectImgs": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true",
+      "$id": {
+        ".validate": "newData.isString() && newData.val().length <= 1500000"
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0a1030">
+<title>Admin sign in | Desmond Amedzie</title>
+<link rel="icon" href="../assets/logo-mark.png">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/chat.css">
+<link rel="stylesheet" href="login.css">
+</head>
+<body class="ib-body lg-body">
+<i class="ib-bl" style="width:520px;height:520px;left:-140px;top:-120px;background:#6a2cff"></i>
+<i class="ib-bl" style="width:560px;height:440px;right:-120px;top:10%;background:#1f6bff"></i>
+<i class="ib-bl" style="width:380px;height:380px;left:38%;bottom:-160px;background:#25c8ff"></i>
+
+<main class="ib-login lg" id="lg">
+  <div class="lg-card" id="card" data-view="signin">
+
+    <!-- sign in -->
+    <form id="sf" class="lg-pane" autocomplete="on" novalidate>
+      <div class="orbx" aria-hidden="true"><b><s></s><s></s></b><i></i></div>
+      <p class="hi2">Welcome back</p>
+      <h1>Admin</h1>
+      <p class="sub" id="sub">Sign in to manage your site and reply to visitors.</p>
+
+      <p class="nc-demo lg-note" id="demo" hidden>Demo mode: no server is connected yet, so any password works while you test locally.</p>
+      <p class="lg-warn" id="cfgErr" role="alert" hidden>This site has no chat server connected yet, so the admin is switched off. Set the Firebase environment variables in the Vercel project and redeploy.</p>
+
+      <label>Email
+        <input name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="120">
+      </label>
+      <label>Password
+        <span class="lg-pw">
+          <input name="pw" id="pw" type="password" autocomplete="current-password" required maxlength="200" aria-describedby="caps">
+          <button type="button" class="lg-eye" id="eye" aria-label="Show password" aria-pressed="false"></button>
+        </span>
+      </label>
+      <p class="lg-caps" id="caps" hidden>Caps Lock is on</p>
+
+      <div class="lg-row">
+        <label class="lg-chk"><input type="checkbox" id="keep" checked><span>Keep me signed in</span></label>
+        <button type="button" class="lg-link" id="toReset">Forgot password?</button>
+      </div>
+
+      <button class="btn" id="go" type="submit"><span>Sign in</span></button>
+      <p class="err" id="err" role="alert" aria-live="assertive"></p>
+    </form>
+
+    <!-- reset password -->
+    <form id="rf" class="lg-pane" novalidate hidden>
+      <div class="orbx" aria-hidden="true"><b><s></s><s></s></b><i></i></div>
+      <p class="hi2">No worries</p>
+      <h1>Reset</h1>
+      <p class="sub">Enter your admin email and we will send a reset link.</p>
+      <label>Email
+        <input name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="120">
+      </label>
+      <button class="btn" id="rgo" type="submit"><span>Send reset link</span></button>
+      <p class="err" id="rerr" role="alert" aria-live="assertive"></p>
+      <p class="lg-ok" id="rok" role="status" hidden>If that email belongs to the admin account, a reset link is on its way. Check your spam folder too.</p>
+      <button type="button" class="lg-link lg-back" id="toSign">Back to sign in</button>
+    </form>
+
+  </div>
+  <p class="lg-foot"><a href="../index.html">&#8592; Back to site</a></p>
+</main>
+
+<script src="../js/firebase-config.js"></script>
+<script src="../js/chat-config.js"></script>
+<script src="../js/chat-core.js"></script>
+<script src="login.js"></script>
+</body>
+</html>

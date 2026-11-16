@@ -1,0 +1,107 @@
+/* projects.js: one place for the portfolio's projects.
+   - Built-in projects live in data.js (window.WORKS) and are never changed here.
+   - Projects added from the admin are stored in Firebase (live) or localStorage (demo),
+     then merged into window.WORKS so every page (home, work, case study) shows them.
+   Load order: data.js, chat-config.js, chat-core.js, projects.js, then the page scripts.
+   Pages that draw projects should draw once now and again on the 'nst:projects' event. */
+(() => {
+  'use strict';
+  const cfg = window.NST_CHAT || {}, fb = cfg.firebase || {};
+  const db = (fb.databaseURL || '').replace(/\/+$/, '');
+  const live = !!(db && fb.apiKey);
+  const KEY = 'nst_projects_v1', CACHE = 'nst_projects_cache', IMGS = 'nst_project_imgs_v1';
+  const builtin = (window.WORKS || []).map(w => ({ ...w, builtin: true }));
+  const rd = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v) } catch { return d } };
+  const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true } catch { return false } };
+
+  let custom = [], listeners = new Set();
+  const tok = () => (window.NSTCore && window.NSTCore.token && window.NSTCore.token()) || null;
+
+  /* ---------- normalise one stored record into the shape the pages expect ---------- */
+  const shape = (id, r) => ({
+    id, custom: true, status: r.status || 'Shipped', created: r.created || 0,
+    t: r.t || 'Untitled project', tag: r.tag || 'Frontend', d: r.d || '', img: r.img || '', src: r.thumb || '',
+    client: r.client || '', role: r.role || '', year: r.year || String(new Date().getFullYear()),
+    stack: Array.isArray(r.stack) ? r.stack : String(r.stack || '').split(',').map(s => s.trim()).filter(Boolean),
+    live: r.live || '', brief: r.brief || '', built: r.built || '', result: r.result || ''
+  });
+  const fromTree = tree => Object.entries(tree || {}).map(([id, r]) => shape(id, r || {})).sort((a, b) => b.created - a.created);
+
+  /* ---------- build window.WORKS = custom first, then built-ins ---------- */
+  const merge = () => {
+    const all = [...custom, ...builtin.map((w, i) => ({ ...w, id: i }))];
+    window.WORKS = all; window.NSTProjects.list = all;
+    listeners.forEach(f => { try { f(all) } catch {} });
+    document.dispatchEvent(new CustomEvent('nst:projects', { detail: all }));
+  };
+
+  /* ---------- image URL for any project ---------- */
+  const imgOf = w => w.src || `assets/${w.img}.jpg`;
+  const imgAdmin = w => w.src ? w.src : `../assets/${w.img}.jpg`;
+
+  /* ---------- LIVE transport (Firebase REST) ---------- */
+  const url = (p, auth) => `${db}/${p}.json${auth ? '?auth=' + encodeURIComponent(auth) : ''}`;
+  const http = async (method, p, body) => {
+    const r = await fetch(url(p, method === 'GET' ? null : tok()), { method, body: body === undefined ? undefined : JSON.stringify(body) });
+    if (!r.ok) throw new Error('http ' + r.status);
+    return r.json();
+  };
+
+  /* ---------- load ---------- */
+  const load = async () => {
+    if (!live) { custom = fromTree(rd(KEY, {})); merge(); return }
+    custom = fromTree(rd(CACHE, {})); merge();                           // instant paint from the last visit
+    try { const t = await http('GET', 'projects'); wr(CACHE, t || {}); custom = fromTree(t); merge() } catch {}
+  };
+
+  /* ---------- admin API (writes use the admin sign-in token from chat-core.js) ---------- */
+  const newId = () => 'p' + Date.now().toString(36) + [...crypto.getRandomValues(new Uint8Array(4))].map(b => (b % 36).toString(36)).join('');
+  const save = async (id, rec, fullImg) => {
+    id = id || newId(); rec = { ...rec, created: rec.created || Date.now() };
+    if (live) {
+      await http('PUT', `projects/${id}`, rec);
+      if (fullImg !== undefined) { if (fullImg) await http('PUT', `projectImgs/${id}`, fullImg); else await http('DELETE', `projectImgs/${id}`) }
+      const t = await http('GET', 'projects'); wr(CACHE, t || {}); custom = fromTree(t);
+    } else {
+      const m = rd(KEY, {}); m[id] = rec; if (!wr(KEY, m)) throw new Error('This browser is out of storage space. Try a smaller image.');
+      if (fullImg !== undefined) { const im = rd(IMGS, {}); if (fullImg) im[id] = fullImg; else delete im[id]; wr(IMGS, im) }
+      custom = fromTree(m);
+    }
+    merge(); return id;
+  };
+  const remove = async id => {
+    if (live) { await http('DELETE', `projects/${id}`); await http('DELETE', `projectImgs/${id}`); const t = await http('GET', 'projects'); wr(CACHE, t || {}); custom = fromTree(t) }
+    else { const m = rd(KEY, {}); delete m[id]; wr(KEY, m); const im = rd(IMGS, {}); delete im[id]; wr(IMGS, im); custom = fromTree(m) }
+    merge();
+  };
+  // raw stored record (used by the edit form so thumbnails are not re-encoded)
+  const raw = async id => live ? http('GET', `projects/${id}`) : rd(KEY, {})[id];
+  // the larger picture, loaded only on the case study page and in the lightbox
+  const full = async id => { try { if (live) return await (await fetch(url(`projectImgs/${id}`))).json(); return rd(IMGS, {})[id] || null } catch { return null } };
+
+  /* ---------- resize an uploaded file in the browser so it fits in the database ---------- */
+  const shrink = (file, max, q) => new Promise((res, rej) => {
+    if (!/^image\//.test(file.type)) return rej(new Error('Please choose an image file.'));
+    const fr = new FileReader();
+    fr.onerror = () => rej(new Error('Could not read that file.'));
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = () => rej(new Error('That image could not be opened.'));
+      im.onload = () => {
+        const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL('image/jpeg', q));
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+
+  window.NSTProjects = {
+    live, list: [], imgOf, imgAdmin, save, remove, raw, full, shrink, load,
+    onChange: f => { listeners.add(f); return () => listeners.delete(f) },
+    find: id => window.WORKS.find(w => String(w.id) === String(id))
+  };
+  load();
+})();

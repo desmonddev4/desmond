@@ -1,0 +1,13 @@
+{
+  "name": "Desmond Amedzie",
+  "short_name": "Desmond",
+  "description": "Full stack developer and CEO of Nexus Sync Technologies.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a1030",
+  "theme_color": "#0a1030",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" }
+  ]
+}

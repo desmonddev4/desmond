@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact | Desmond Amedzie</title>
+<meta name="description" content="Chat live with Desmond Amedzie, or reach him on WhatsApp or email.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a1030">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Desmond Amedzie">
+<meta property="og:title" content="Contact | Desmond Amedzie">
+<meta property="og:description" content="Chat live with Desmond Amedzie, or reach him on WhatsApp or email.">
+<meta property="og:image" content="assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/chat.css">
+<noscript><style>.loader,.curtain,.cur,.prog{display:none!important}</style></noscript>
+</head>
+<body>
+<div class="prog"></div>
+<div class="loader"><img src="assets/logo-mark.png" alt=""></div>
+<div class="curtain"></div>
+<div class="cur"></div>
+<div class="toast" role="status"></div>
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="index.html" aria-label="Desmond Amedzie, home"><img src="assets/logo-mark.png" alt=""><span><b>Desmond Amedzie</b><small>Full stack developer</small></span></a>
+  <ul>
+    <span class="pill"></span>
+    <li><a class="ni" href="index.html"><img class="nic nic-hm" src="assets/icons/home.png" alt="" width="128" height="128" decoding="async">Home</a></li>
+    <li><a class="ni" href="about.html"><img class="nic nic-ab" src="assets/icons/about.png" alt="" width="117" height="128" decoding="async">About</a></li>
+    <li><a class="ni" href="work.html"><img class="nic nic-wk" src="assets/icons/work.png" alt="" width="128" height="117" decoding="async">Work</a></li>
+    <li><a class="ni" href="services.html"><img class="nic nic-sv" src="assets/icons/service.png" alt="" width="100" height="128" decoding="async">Services</a></li>
+    <li><a class="ni" href="contact.html" aria-current="page"><img class="nic nic-ml" src="assets/icons/mail.png" alt="" width="160" height="112" decoding="async">Contact</a></li>
+  <li class="mh"><a href="#chat" data-chat>Hire me</a></li>
+  </ul>
+  <div class="navr"><a class="btn mag" href="#chat" data-chat aria-haspopup="dialog">Hire me</a><button class="menu" aria-expanded="false" aria-label="Menu"><i></i><i></i></button></div>
+</nav>
+<main>
+
+<header class="pg-head"><h1 class="disp">Let's <em>talk.</em></h1><p>Tell me about your project. Chat with me live, or use WhatsApp or email.</p><div class="live-cta"><button type="button" class="btn mag" data-chat><span class="dot" data-chat-status data-state="away"></span>Start live chat</button></div><div class="orb" data-depth="40" style="width:64px;height:64px;right:14%;top:30%"><b></b></div><div class="orb v" data-depth="-50" style="width:40px;height:40px;right:30%;bottom:18%"><b style="animation-delay:-2s"></b></div></header>
+<section class="sec" style="padding-top:30px"><div class="cwrap">
+  <div>
+    <button type="button" class="ct ct-live rv" data-chat aria-haspopup="dialog"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.7 7L4 20l1.1-4.6A8 8 0 1 1 21 12Z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/></svg></span><span><small><span class="dot" data-chat-status data-state="away"></span><span data-chat-text>Away, leave a message</span></small><b>Live chat</b></span><span class="go"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+    <a class="ct rv" href="https://wa.me/233509459009" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.7 7L4 20l1.1-4.6A8 8 0 1 1 21 12Z"/></svg></span><span><small>WhatsApp</small><b>0509 459 009</b></span></a>
+    <a class="ct rv" href="mailto:damedzie4@gmail.com"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span><small>Email</small><b>damedzie4@gmail.com</b></span></a>
+    <div class="ct rv"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><small>Based in</small><b>Kumasi, Ghana</b></span></div>
+  </div>
+  <form class="cform rv" id="cf" novalidate>
+    <h2 class="disp">Send a message</h2>
+    <label class="fld"><span>Your name</span><input name="name" autocomplete="name" placeholder="Jane Mensah"></label>
+    <label class="fld"><span>Email (optional)</span><input name="email" type="email" autocomplete="email" placeholder="you@example.com"></label>
+    <div class="fld"><span>Project type</span><div class="opts"><label><input type="radio" name="type" value="Website" checked><span>Website</span></label><label><input type="radio" name="type" value="Web app"><span>Web app</span></label><label><input type="radio" name="type" value="E-commerce"><span>E-commerce</span></label><label><input type="radio" name="type" value="Motion design"><span>Motion design</span></label><label><input type="radio" name="type" value="Something else"><span>Something else</span></label></div></div>
+    <label class="fld"><span>Message</span><textarea name="msg" placeholder="What are you building and when do you need it?"></textarea></label>
+    <div class="fb"><button type="button" class="btn mag" id="wa">Send on WhatsApp</button><button type="button" class="btn ghost mag" id="em">Send by email</button></div>
+  </form>
+</div></section>
+</main>
+<footer class="foot">
+  <i class="bl" style="width:420px;height:420px;left:-80px;top:-60px;background:#6a2cff"></i>
+  <i class="bl" style="width:460px;height:360px;right:-60px;top:30px;background:#1f6bff"></i>
+  <i class="bl" style="width:300px;height:300px;left:45%;bottom:-80px;background:#25c8ff"></i>
+  <div class="glass">
+    <div class="cols">
+      <div class="fbrand"><img class="fl" src="assets/logo-full-clear.png" alt="Nexus Sync Technologies"><p>Full stack developer and CEO of Nexus Sync Technologies, based in Kumasi.</p><figure class="sig" data-r="zoom"><div class="sig-pad"><img src="assets/signature.png" alt="Signature of Desmond Amedzie" width="472" height="227" loading="lazy" decoding="async"></div></figure></div>
+      <div><h4>Pages</h4><ul class="fg2"><li><a class="wi" href="index.html"><img class="fic fic-hm" src="assets/icons/home.png" alt="" width="128" height="128" loading="lazy" decoding="async">Home</a></li><li><a class="wi" href="about.html"><img class="fic fic-ab" src="assets/icons/about.png" alt="" width="117" height="128" loading="lazy" decoding="async">About</a></li><li><a class="wi" href="work.html"><img class="fic fic-wk" src="assets/icons/work.png" alt="" width="128" height="117" loading="lazy" decoding="async">Work</a></li><li><a class="wi" href="services.html"><img class="fic fic-sv" src="assets/icons/service.png" alt="" width="100" height="128" loading="lazy" decoding="async">Services</a></li><li><a class="wi" href="cv.html"><img class="fic fic-cv" src="assets/icons/cv.png" alt="" width="103" height="128" loading="lazy" decoding="async">CV</a></li><li><a class="wi" href="contact.html"><img class="fic fic-ml" src="assets/icons/mail.png" alt="" width="160" height="112" loading="lazy" decoding="async">Contact</a></li></ul></div>
+      <div><h4>Elsewhere</h4><ul><li><a class="wi" href="#"><img class="fic fic-gh" src="assets/icons/github.png" alt="" width="160" height="160" loading="lazy" decoding="async">GitHub</a></li><li><a class="wi" href="#"><img class="fic fic-li" src="assets/icons/linkedin.png" alt="" width="160" height="160" loading="lazy" decoding="async">LinkedIn</a></li><li><a class="wi" href="#"><svg class="fic fic-x" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-7.3 8.4L23 22h-6.7l-5.2-6.8L5 22H1.9l7.8-9L1.5 2h6.9l4.7 6.2L18.9 2zm-1.2 18h1.8L6.4 3.9H4.5L17.7 20z"/></svg>X</a></li><li><a class="wi" href="https://wa.me/233509459009" target="_blank" rel="noopener"><img class="fic fic-wa" src="assets/icons/whatsapp.png" alt="" width="160" height="156" loading="lazy" decoding="async">WhatsApp</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li><a class="wi" href="mailto:damedzie4@gmail.com"><img class="fic fic-ml" src="assets/icons/mail.png" alt="" width="160" height="112" loading="lazy" decoding="async">damedzie4@gmail.com</a></li><li><a class="wi" href="tel:+233509459009"><img class="fic fic-cl" src="assets/icons/call.png" alt="" width="128" height="160" loading="lazy" decoding="async">0509 459 009</a></li><li class="c wi"><img class="fic fic-pn" src="assets/icons/pin.png" alt="" width="86" height="160" loading="lazy" decoding="async"><span>Kumasi, Ghana, <span id="clock">--:--</span> GMT</span></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Desmond Amedzie</span><a href="#hero">Back to top</a></div>
+  </div>
+</footer>
+<script src="js/data.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/chat-config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/scroll-fx.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/chat-core.js"></script>
+<script src="js/chat-ui.js"></script>
+<script src="js/chat.js"></script>
+</body>
+</html>
