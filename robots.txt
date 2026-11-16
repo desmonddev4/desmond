@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /inbox.html
 
-Sitemap: https://example.com/sitemap.xml
+Sitemap: https://desmond-zkae.vercel.app/sitemap.xml
