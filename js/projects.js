@@ -47,7 +47,11 @@
       const text = await r.text();
       let reason = text;
       try { const data = JSON.parse(text); reason = typeof data === 'string' ? data : data.error || text } catch {}
-      const e = new Error(`Firebase rejected ${method} ${p} (${r.status}): ${reason || r.statusText}`);
+      const auth = window.NSTCore.authInfo ? window.NSTCore.authInfo() : {};
+      const diagnostic = r.status === 401 || r.status === 403
+        ? ` Token email=${auth.email || 'missing'}, email_verified=${auth.emailVerified === true}, project=${auth.projectId || 'missing'}, database=${new URL(db).hostname}.`
+        : '';
+      const e = new Error(`Firebase rejected ${method} ${p} (${r.status}): ${reason || r.statusText}.${diagnostic}`);
       e.status = r.status; e.path = p; e.reason = reason;
       throw e;
     }

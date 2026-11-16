@@ -168,6 +168,10 @@
 
   window.NSTCore = {
     live, local, misconfigured, rnd, newKey, token: () => token,
+    authInfo: () => {
+      const c = jwt(token);
+      return { email: String(c.email || ''), emailVerified: c.email_verified === true, projectId: String(c.aud || '') };
+    },
     visitor: cid => (live ? liveVisitor : demoVisitor)(cid),
     admin: live ? liveAdmin : demoAdmin,
     presence: cb => live ? mirror('owner', cb) : watch(() => cb(rd().owner || {})),
