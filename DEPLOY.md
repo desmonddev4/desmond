@@ -9,11 +9,13 @@ Follow `CHAT-SETUP.md` steps 1 to 3. Until the Vercel build has both Firebase en
 
 For Vercel, add `NST_FIREBASE_DATABASE_URL` and `NST_FIREBASE_API_KEY` in **Project Settings > Environment Variables**. Use the Production environment (and Preview if you want preview deployments to use Firebase too). Set **Framework Preset** to Other, **Build Command** to `node tools/build.mjs`, and **Output Directory** to `dist`. The build writes the Firebase config into the deployment output; it is not committed to Git.
 
+Vercel is configured to serve clean URLs, so use `/about`, `/services`, `/work`, `/contact`, and `/admin/projects` without the `.html` extension. Existing `.html` links redirect to the clean URL.
+
 ## 2. Publish the database rules (required)
 Paste `firebase-rules.json` into Realtime Database > Rules and publish. **The rules are the real lock**: the sign-in page is a convenience, the rules are what stop anyone else reading your inbox or editing projects. Check that your email in the rules matches `owner.email` in `js/chat-config.js`.
 
 ## 3. Verify your admin email (required)
-Rules need a verified email. After deploying, try signing in at `admin/login.html`; the site automatically sends a verification email for an unverified admin. Open that link, then sign in again. A password-reset link does not verify the email. Use a long, unique password.
+Rules need a verified email. After deploying, try signing in at `/admin/login`; the site automatically sends a verification email for an unverified admin. Open that link, then sign in again. A password-reset link does not verify the email. Use a long, unique password.
 
 ## 4. Firebase web key visibility
 The Firebase web API key is included in the deployed JavaScript because browser code needs it. Storing it as a Vercel environment variable keeps it out of Git-tracked source, but does not make it secret after deployment. Firebase database rules—not the key—protect chat and project data.
@@ -35,7 +37,7 @@ Security headers (CSP, HSTS, no-framing), caching and the 404 page are already p
 Serve over **HTTPS** at the domain root (not a sub-folder).
 
 ## 8. After deploying
-- Open `https://your-domain.com/admin/login.html`, sign in, open the inbox, and send yourself a test message from the site in another browser.
+- Open `https://your-domain.com/admin/login`, sign in, open the inbox, and send yourself a test message from the site in another browser.
 - Add the site to Google Search Console and submit `sitemap.xml`.
 - Optional: turn on Firebase **App Check** if you ever see spam; set a Firebase budget alert.
 
