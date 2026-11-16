@@ -189,8 +189,10 @@
       if (!d) return fail('Add a short description.', form.elements.d);
       if (!thumb) return fail('Add a cover image.', drop);
       if (live && !/^https?:\/\//i.test(live)) return fail('The live link must start with http:// or https://', form.elements.live);
+      const stack = g('stack').split(',').map(s => s.trim()).filter(Boolean).slice(0, 12);
+      if (stack.some(s => s.length > 40)) return fail('Each technology name must be 40 characters or fewer.', form.elements.stack);
       const next = { ...rec, t, tag, d, img: '', thumb, status: g('status'), live, client: g('client'), role: g('role'), year: g('year') || String(new Date().getFullYear()),
-        stack: g('stack').split(',').map(s => s.trim()).filter(Boolean).slice(0, 12), brief: g('brief'), built: g('built'), result: g('result') };
+        stack, brief: g('brief'), built: g('built'), result: g('result') };
       busy = true; err.hidden = true; const go = $('[data-go]'); go.textContent = 'Saving…'; form.querySelector('.fill').disabled = true;
       try { await P.save(editing ? id : null, next, full); x.toast(editing ? 'Project updated' : 'Project added. It is live on your site.'); close() }
       catch (ex) { busy = false; go.textContent = editing ? 'Save changes' : 'Add project'; form.querySelector('.fill').disabled = false; fail(ex.status === 401 || ex.status === 403 ? `${ex.message}. Check that your signed-in email is damedzie4@gmail.com and is verified.` : (ex.message || 'Could not save. Check your connection and try again.')) }
