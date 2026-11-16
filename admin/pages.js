@@ -163,7 +163,7 @@
     const fail = (t, el) => { err.textContent = t; err.hidden = false; el && el.focus() };
     const take = async f => {
       if (!f) return; err.hidden = true;
-      try { [thumb, full] = await Promise.all([P.shrink(f, 900, .78), P.shrink(f, 1800, .82)]); prev.src = thumb; prev.hidden = false; $('.dtxt b', drop).textContent = 'Replace image'; drop.classList.add('has') }
+      try { [thumb, full] = await Promise.all([P.shrink(f, 900, .78, 400000), P.shrink(f, 1800, .82, 1500000)]); prev.src = thumb; prev.hidden = false; $('.dtxt b', drop).textContent = 'Replace image'; drop.classList.add('has') }
       catch (e) { fail(e.message) }
     };
     drop.addEventListener('click', () => file.click());
@@ -193,7 +193,7 @@
         stack: g('stack').split(',').map(s => s.trim()).filter(Boolean).slice(0, 12), brief: g('brief'), built: g('built'), result: g('result') };
       busy = true; err.hidden = true; const go = $('[data-go]'); go.textContent = 'Saving…'; form.querySelector('.fill').disabled = true;
       try { await P.save(editing ? id : null, next, full); x.toast(editing ? 'Project updated' : 'Project added. It is live on your site.'); close() }
-      catch (ex) { busy = false; go.textContent = editing ? 'Save changes' : 'Add project'; form.querySelector('.fill').disabled = false; fail(ex.status === 401 || ex.status === 403 ? 'Firebase denied this change. Sign in again; if it still fails, publish firebase-rules.json and check the owner email in its rules.' : (ex.message || 'Could not save. Check your connection and try again.')) }
+      catch (ex) { busy = false; go.textContent = editing ? 'Save changes' : 'Add project'; form.querySelector('.fill').disabled = false; fail(ex.status === 401 || ex.status === 403 ? `${ex.message}. Check that your signed-in email is damedzie4@gmail.com and is verified.` : (ex.message || 'Could not save. Check your connection and try again.')) }
     });
     requestAnimationFrame(() => { m.classList.add('on'); form.elements.t.focus({ preventScroll: true }) });
   };

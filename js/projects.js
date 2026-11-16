@@ -43,7 +43,14 @@
     const request = () => fetch(url(p, method === 'GET' ? null : tok()), { method, body: body === undefined ? undefined : JSON.stringify(body) });
     let r = await request();
     if (live && method !== 'GET' && (r.status === 401 || r.status === 403) && await window.NSTCore.admin.ready()) r = await request();
-    if (!r.ok) { const e = new Error('http ' + r.status); e.status = r.status; throw e }
+    if (!r.ok) {
+      const text = await r.text();
+      let reason = text;
+      try { const data = JSON.parse(text); reason = typeof data === 'string' ? data : data.error || text } catch {}
+      const e = new Error(`Firebase rejected ${method} ${p} (${r.status}): ${reason || r.statusText}`);
+      e.status = r.status; e.path = p; e.reason = reason;
+      throw e;
+    }
     return r.json();
   };
 
@@ -80,7 +87,7 @@
   const full = async id => { try { if (live) return await (await fetch(url(`projectImgs/${id}`))).json(); return rd(IMGS, {})[id] || null } catch { return null } };
 
   /* ---------- resize an uploaded file in the browser so it fits in the database ---------- */
-  const shrink = (file, max, q) => new Promise((res, rej) => {
+  const shrink = (file, max, q, maxLength) => new Promise((res, rej) => {
     if (!/^image\//.test(file.type)) return rej(new Error('Please choose an image file.'));
     const fr = new FileReader();
     fr.onerror = () => rej(new Error('Could not read that file.'));
@@ -89,9 +96,18 @@
       im.onerror = () => rej(new Error('That image could not be opened.'));
       im.onload = () => {
         const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
-        c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
-        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
-        res(c.toDataURL('image/jpeg', q));
+        let w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k));
+        const g = c.getContext('2d');
+        while (true) {
+          c.width = w; c.height = h;
+          g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(im, 0, 0, w, h);
+          for (let quality = q; quality >= .35; quality -= .1) {
+            const result = c.toDataURL('image/jpeg', quality);
+            if (result.length <= maxLength) return res(result);
+          }
+          if (Math.max(w, h) <= 320) return rej(new Error('This image cannot be compressed enough. Choose a simpler or smaller image.'));
+          w = Math.max(1, Math.round(w * .8)); h = Math.max(1, Math.round(h * .8));
+        }
       };
       im.src = fr.result;
     };
