@@ -28,5 +28,5 @@ writeFileSync(join(root, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
   list.map(p => `  <url><loc>${arg}/${p}</loc><lastmod>${day}</lastmod></url>`).join('\n') + `\n</urlset>\n`);
 writeFileSync(join(root, 'robots.txt'),
-  `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /inbox\n\nSitemap: ${arg}/sitemap.xml\n`);
+  `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /inbox\n\nSitemap: ${arg}/sitemap.xml\n`);
 console.log('Done for ' + arg);

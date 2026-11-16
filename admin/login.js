@@ -10,7 +10,10 @@
   /* ---------- where to go afterwards (allow-list: never an open redirect) ---------- */
   const dest = (() => {
     const n = new URLSearchParams(location.search).get('next') || '';
-    return /^(\.\.\/inbox\.html|(index|conversations|leads|projects|audience|system)\.html)(\?[\w=&%.\-]{0,120})?$/.test(n) ? n : 'index.html';
+    const inbox = n.match(/^\.\.\/inbox(?:\.html)?(\?[\w=&%.\-]{0,120})?$/);
+    if (inbox) return '/inbox' + (inbox[1] || '');
+    const admin = n.match(/^(index|conversations|leads|projects|audience|system)(?:\.html)?(\?[\w=&%.\-]{0,120})?$/);
+    return admin ? `/admin${admin[1] === 'index' ? '' : `/${admin[1]}`}${admin[2] || ''}` : '/admin';
   })();
   const enter = () => location.replace(dest);
 

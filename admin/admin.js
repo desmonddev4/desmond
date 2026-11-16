@@ -43,18 +43,18 @@
 
   /* ---------- navigation ---------- */
   const NAV = [
-    { id: 'overview', href: 'index.html', label: 'Overview', img: 'home' },
-    { id: 'conversations', href: 'conversations.html', label: 'Conversations', img: 'chatbot', badge: true },
-    { id: 'leads', href: 'leads.html', label: 'Leads', img: 'mail' },
-    { id: 'projects', href: 'projects.html', label: 'Projects', img: 'work' },
-    { id: 'audience', href: 'audience.html', label: 'Audience', img: 'about' },
-    { id: 'system', href: 'system.html', label: 'System', svg: 'cog' }
+    { id: 'overview', href: '/admin', label: 'Overview', img: 'home' },
+    { id: 'conversations', href: '/admin/conversations', label: 'Conversations', img: 'chatbot', badge: true },
+    { id: 'leads', href: '/admin/leads', label: 'Leads', img: 'mail' },
+    { id: 'projects', href: '/admin/projects', label: 'Projects', img: 'work' },
+    { id: 'audience', href: '/admin/audience', label: 'Audience', img: 'about' },
+    { id: 'system', href: '/admin/system', label: 'System', svg: 'cog' }
   ];
   const SHORT = [
-    { href: '../index.html', label: 'View site', img: 'service', ext: 1 },
-    { href: '../inbox.html', label: 'Live inbox', img: 'chatbot', ext: 1 },
+    { href: '/', label: 'View site', img: 'service', ext: 1 },
+    { href: '/inbox', label: 'Live inbox', img: 'chatbot', ext: 1 },
     { href: 'https://wa.me/' + (own.whatsapp || '233509459009'), label: 'WhatsApp', img: 'whatsapp', ext: 1, blank: 1 },
-    { href: '../cv.html', label: 'My CV', img: 'cv', ext: 1 }
+    { href: '/cv', label: 'My CV', img: 'cv', ext: 1 }
   ];
   const pi = n => n.img ? `<span class="pi">${png(n.img)}</span>` : `<span class="pi sv">${ic[n.svg]}</span>`;
 
@@ -178,7 +178,7 @@
   const buildShell = (page, title, sub) => {
     document.body.insertAdjacentHTML('beforeend', '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="gsp" x1="0" x2="1"><stop offset="0" stop-color="#a27bff"/><stop offset="1" stop-color="#6e93ff"/></linearGradient><linearGradient id="gsf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b7cff" stop-opacity=".28"/><stop offset="1" stop-color="#7b7cff" stop-opacity="0"/></linearGradient></defs></svg>');
     $('#side').innerHTML = `<div class="side-in"><i class="bl" style="width:240px;height:240px;left:-90px;top:-60px;background:#1d3fff"></i><i class="bl" style="width:220px;height:220px;right:-100px;bottom:80px;background:#3a1fc0"></i>
-      <a class="sbrand" href="index.html" aria-label="Admin overview"><img src="../assets/logo-mark.png" alt=""><span><b>Nexus Sync</b><small>Admin console</small></span></a>
+      <a class="sbrand" href="/admin" aria-label="Admin overview"><img src="../assets/logo-mark.png" alt=""><span><b>Nexus Sync</b><small>Admin console</small></span></a>
       <nav class="snav" aria-label="Admin"><h4>Manage</h4><ul>${NAV.map(n => `<li><a class="pb" href="${n.href}"${n.id === page ? ' aria-current="page"' : ''}>${pi(n)}<span>${n.label}</span>${n.badge ? '<b class="n" data-badge hidden>0</b>' : ''}</a></li>`).join('')}</ul>
       <h4>Shortcuts</h4><ul>${SHORT.map(n => `<li><a class="pb" href="${n.href}"${n.blank ? ' target="_blank" rel="noopener"' : ''}>${pi(n)}<span>${n.label}</span></a></li>`).join('')}</ul></nav>
       <div class="sfoot"><div class="me" data-on="false" id="me"><span class="av">${esc(ini(own.name || 'D'))}</span><span><b>${esc(own.name || 'Desmond')}</b><small><i class="dot"></i><span id="meSt">Checking…</span></small></span></div>
@@ -188,15 +188,15 @@
       <span class="tag-s" id="sampleTag" hidden>${ic.warn.replace('<svg', '<svg width="15" height="15" style="stroke:#8a5a00;fill:none;stroke-width:2.2"')}Sample data</span>
       <label class="srch">${ic.search}<input id="gs" type="search" placeholder="Search conversations" aria-label="Search conversations" autocomplete="off"></label>
       <label class="avail" data-on="false" id="av"><i class="dot"></i><span class="lbl">Available</span><input class="sw" id="avSw" type="checkbox" role="switch" aria-label="Show me as available"></label>
-      <a class="ib" href="conversations.html?f=awaiting" aria-label="Awaiting reply">${ic.bell}<b class="bd" data-badge hidden>0</b></a>
+      <a class="ib" href="/admin/conversations?f=awaiting" aria-label="Awaiting reply">${ic.bell}<b class="bd" data-badge hidden>0</b></a>
       <span class="av sm" title="${esc(own.name || 'Desmond')}">${esc(ini(own.name || 'D'))}</span>`;
     const side = $('#side'), scrim = $('#scrim'), mb = $('#mbtn'), close = () => { side.classList.remove('open'); scrim.classList.remove('on'); mb.setAttribute('aria-expanded', 'false') };
     mb.addEventListener('click', () => { const o = side.classList.toggle('open'); scrim.classList.toggle('on', o); mb.setAttribute('aria-expanded', o) });
     scrim.addEventListener('click', close); document.addEventListener('keydown', e => e.key === 'Escape' && close());
     $$('.pb', side).forEach(a => a.addEventListener('click', close));
     const top = $('#top'), sc = () => top.classList.toggle('scrolled', scrollY > 24); addEventListener('scroll', sc, { passive: true }); sc();
-    $('#gs').addEventListener('keydown', e => { if (e.key === 'Enter' && page !== 'conversations') { const q = e.target.value.trim(); location.href = 'conversations.html' + (q ? '?q=' + encodeURIComponent(q) : '') } });
-    $('#out').addEventListener('click', async e => { e.preventDefault(); try { await A.presence(false) } catch {} A.logout(); location.replace('login.html') });
+    $('#gs').addEventListener('keydown', e => { if (e.key === 'Enter' && page !== 'conversations') { const q = e.target.value.trim(); location.href = '/admin/conversations' + (q ? '?q=' + encodeURIComponent(q) : '') } });
+    $('#out').addEventListener('click', async e => { e.preventDefault(); try { await A.presence(false) } catch {} A.logout(); location.replace('/admin/login') });
     const sw = $('#avSw'); sw.checked = lsGet('nst_avail', true);
     const paintAv = () => { $('#av').dataset.on = sw.checked; $('#me').dataset.on = sw.checked; $('#meSt').textContent = sw.checked ? 'Available to visitors' : 'Away'; $('.lbl', $('#av')).textContent = sw.checked ? 'Available' : 'Away' };
     const pulse = () => A.presence(sw.checked).catch(() => {});
@@ -204,7 +204,7 @@
     paintAv(); pulse(); setInterval(pulse, 30000);
   };
   // No session? Send them to the one sign-in page and bring them back afterwards.
-  const toLogin = () => { const page = (location.pathname.split('/').pop() || 'index.html'); location.replace('login.html?next=' + encodeURIComponent(page + location.search)) };
+  const toLogin = () => { const page = document.body.dataset.page || 'overview'; location.replace('/admin/login?next=' + encodeURIComponent((page === 'overview' ? 'index' : page) + location.search)) };
 
   const start = async pages => {
     const body = document.body, id = body.dataset.page, P = pages[id]; if (!P) return;
