@@ -67,15 +67,22 @@
   });
 
   const API_KEY = fb.apiKey;
+  const refreshSession = () => {
+    if (!refresh) return;
+    doRefresh().catch(e => {
+      if (e && e.dead) { token = null; refresh = null; stClear(); return }
+      tokenTimer = setTimeout(refreshSession, 30000);
+    });
+  };
   const applyToken = (idToken, rt, expires, remember) => {
     token = idToken; refresh = rt;
     stSet(rt, remember === undefined ? !inSession() : remember);
     clearTimeout(tokenTimer);
-    tokenTimer = setTimeout(() => doRefresh().catch(() => {}), Math.max(60, (+expires || 3600) - 120) * 1000);
+    tokenTimer = setTimeout(refreshSession, Math.max(60, (+expires || 3600) - 120) * 1000);
   };
   const doRefresh = async () => {
     const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refresh)}` });
-    if (!r.ok) { const e = new Error('refresh failed'); e.dead = r.status >= 400 && r.status < 500; throw e }
+    if (!r.ok) { const e = new Error('refresh failed'); e.dead = r.status >= 400 && r.status < 500 && r.status !== 429; throw e }
     const d = await r.json(); applyToken(d.id_token, d.refresh_token, d.expires_in);
   };
   const liveAdmin = {

@@ -193,7 +193,7 @@
         stack: g('stack').split(',').map(s => s.trim()).filter(Boolean).slice(0, 12), brief: g('brief'), built: g('built'), result: g('result') };
       busy = true; err.hidden = true; const go = $('[data-go]'); go.textContent = 'Saving…'; form.querySelector('.fill').disabled = true;
       try { await P.save(editing ? id : null, next, full); x.toast(editing ? 'Project updated' : 'Project added. It is live on your site.'); close() }
-      catch (ex) { busy = false; go.textContent = editing ? 'Save changes' : 'Add project'; form.querySelector('.fill').disabled = false; fail(/401|403/.test(ex.message) ? 'Not allowed. Sign in again and make sure the database rules from firebase-rules.json are published.' : (ex.message || 'Could not save. Check your connection and try again.')) }
+      catch (ex) { busy = false; go.textContent = editing ? 'Save changes' : 'Add project'; form.querySelector('.fill').disabled = false; fail(ex.status === 401 || ex.status === 403 ? 'Firebase denied this change. Sign in again; if it still fails, publish firebase-rules.json and check the owner email in its rules.' : (ex.message || 'Could not save. Check your connection and try again.')) }
     });
     requestAnimationFrame(() => { m.classList.add('on'); form.elements.t.focus({ preventScroll: true }) });
   };

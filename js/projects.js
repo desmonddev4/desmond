@@ -40,8 +40,10 @@
   /* ---------- LIVE transport (Firebase REST) ---------- */
   const url = (p, auth) => `${db}/${p}.json${auth ? '?auth=' + encodeURIComponent(auth) : ''}`;
   const http = async (method, p, body) => {
-    const r = await fetch(url(p, method === 'GET' ? null : tok()), { method, body: body === undefined ? undefined : JSON.stringify(body) });
-    if (!r.ok) throw new Error('http ' + r.status);
+    const request = () => fetch(url(p, method === 'GET' ? null : tok()), { method, body: body === undefined ? undefined : JSON.stringify(body) });
+    let r = await request();
+    if (live && method !== 'GET' && (r.status === 401 || r.status === 403) && await window.NSTCore.admin.ready()) r = await request();
+    if (!r.ok) { const e = new Error('http ' + r.status); e.status = r.status; throw e }
     return r.json();
   };
 
