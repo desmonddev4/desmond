@@ -338,6 +338,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--paste
 .loader{background:var(--pastel)}
 .curtain{background:var(--send)}
 .cur{background:#7b6bff;mix-blend-mode:normal;opacity:.55}
+.cur.editing{opacity:0}
 .prog{background:var(--send)}
 
 /* buttons */

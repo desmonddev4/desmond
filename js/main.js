@@ -36,7 +36,11 @@
 
   // cursor + magnetic buttons
   const cur = $('.cur'); let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
-  addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY });
+  addEventListener('pointermove', e => {
+    mx = e.clientX; my = e.clientY;
+    const target = e.target;
+    cur.classList.toggle('editing', target instanceof Element && !!target.closest('input,textarea,[contenteditable="true"]'));
+  });
   $$('a,button,.card').forEach(el => { el.addEventListener('mouseenter', () => cur.classList.add('big')); el.addEventListener('mouseleave', () => cur.classList.remove('big')) });
   if (fine && !reduce) $$('.mag').forEach(b => {
     b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .3}px,${(e.clientY - r.top - r.height / 2) * .4}px)` });
