@@ -139,9 +139,17 @@
     }
     rail.innerHTML = '<button class="arrow l" aria-label="Previous">&#8249;</button><button class="arrow r" aria-label="Next">&#8250;</button>';
     $('.arrow.l', rail).onclick = () => go(cur2 - 1); $('.arrow.r', rail).onclick = () => go(cur2 + 1);
-    cards = W.map((w, i) => { const d = document.createElement('article'); d.className = 'wc';
-      d.innerHTML = `<div class="shot"><img src="${esc(imgOf(w))}" alt="${esc(w.t)}" loading="lazy"><span class="tag">${esc(w.tag)}</span></div><h3>${esc(w.t)}</h3><p>${esc(w.d)}</p><div class="row"><span>${esc(w.year || '2026')}</span><a class="btn" href="project.html?id=${encodeURIComponent(w.id)}">View project</a></div>`;
-      d.addEventListener('click', () => go(i)); rail.appendChild(d);
+    cards = W.map((w, i) => { const d = document.createElement('article'); d.className = 'wc'; d.style.setProperty('--wc-index', i);
+      d.innerHTML = `<div class="wc-shell"><div class="shot"><img src="${esc(imgOf(w))}" alt="${esc(w.t)}" loading="lazy"><span class="tag">${esc(w.tag)}</span></div><h3>${esc(w.t)}</h3><p>${esc(w.d)}</p><div class="row"><span>${esc(w.year || '2026')}</span><a class="btn" href="project.html?id=${encodeURIComponent(w.id)}">View project</a></div></div>`;
+      d.addEventListener('click', e => { if (!e.target.closest('a')) go(i) });
+      if (fine && !reduce) {
+        const shell = d.querySelector('.wc-shell');
+        d.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; const r = shell.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+          shell.style.setProperty('--tilt-x', `${(x - .5) * 9}deg`); shell.style.setProperty('--tilt-y', `${(.5 - y) * 7}deg`); shell.style.setProperty('--mx', `${x * 100}%`); shell.style.setProperty('--my', `${y * 100}%`);
+        });
+        d.addEventListener('pointerleave', () => { shell.style.setProperty('--tilt-x', '0deg'); shell.style.setProperty('--tilt-y', '0deg'); shell.style.setProperty('--mx', '50%'); shell.style.setProperty('--my', '0%') });
+      }
+      rail.appendChild(d);
       const b = document.createElement('button'); b.setAttribute('aria-label', 'Project ' + (i + 1)); b.onclick = () => go(i); dots.appendChild(b); return d });
     cur2 = Math.max(0, Math.min(cards.length - 1, cur2)); place();
   };
