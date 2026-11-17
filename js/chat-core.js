@@ -28,7 +28,20 @@
   const jwt = t => { try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) } catch { return {} } };
   const u = (p, q, authToken = token) => { const s = new URLSearchParams(q || {}); if (authToken) s.set('auth', authToken); const t = s.toString(); return `${db}/${p}.json${t ? '?' + t : ''}` };
   const call = async (method, p, body, keepalive, authToken = token, query) => {
-    const r = await fetch(u(p, query, authToken), { method, body: body === undefined ? undefined : JSON.stringify(body), keepalive: !!keepalive });
+    // A network change can leave fetch pending indefinitely in some browsers. Bound
+    // the request so the chat can surface a retry state instead of “Sending…” forever.
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let r;
+    try {
+      r = await fetch(u(p, query, authToken), {
+        method, body: body === undefined ? undefined : JSON.stringify(body),
+        keepalive: !!keepalive, signal: controller.signal
+      });
+    } catch (cause) {
+      const error = new Error(cause && cause.name === 'AbortError' ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR');
+      error.code = error.message; error.cause = cause; throw error;
+    } finally { clearTimeout(timeout) }
     let data = null;
     try { data = await r.json() } catch (e) { if (r.ok) throw e }
     if (!r.ok) {
