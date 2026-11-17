@@ -133,7 +133,7 @@ a{color:inherit;text-decoration:none}
 .wc-shell{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;min-height:100%;overflow:hidden;padding:12px;border:1px solid rgba(255,255,255,.32);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.19),rgba(255,255,255,.075) 48%,rgba(115,144,255,.13)),rgba(10,19,62,.66);-webkit-backdrop-filter:blur(24px) saturate(165%);backdrop-filter:blur(24px) saturate(165%);box-shadow:inset 0 1px 0 rgba(255,255,255,.48),inset 0 -1px 0 rgba(255,255,255,.1),0 30px 70px -38px rgba(0,0,0,.8),0 0 0 1px rgba(152,177,255,.08);transform:perspective(1100px) rotateX(var(--tilt-y,0deg)) rotateY(var(--tilt-x,0deg)) translateY(var(--card-lift,0px));transform-style:preserve-3d;transition:transform .45s var(--ease),border-color .45s,box-shadow .45s;animation:wc-enter .72s var(--ease) backwards;animation-delay:calc(var(--wc-index,0)*75ms)}
 .wc-shell::before,.wc-shell::after{content:"";position:absolute;inset:0;pointer-events:none}
 .wc-shell::before{z-index:0;background:radial-gradient(340px circle at var(--mx,50%) var(--my,0%),rgba(199,220,255,.25),rgba(153,173,255,.08) 42%,transparent 72%);opacity:0;transition:opacity .4s}
-.wc-shell::after{inset:-30% auto -30% -70%;z-index:2;width:42%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.14),rgba(255,255,255,.28),transparent);transform:skewX(-16deg);transition:left .85s var(--ease);pointer-events:none}
+.wc-shell::after{inset:-30% auto -30% -70%;z-index:0;width:42%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.1),rgba(255,255,255,.18),transparent);transform:skewX(-16deg);transition:left .85s var(--ease);pointer-events:none}
 .wc-shell>*{position:relative;z-index:1}
 .wc .shot{aspect-ratio:1000/504;border:1px solid rgba(255,255,255,.28);border-radius:18px;overflow:hidden;position:relative;background:#050816;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 14px 30px -22px #000}
 .wc .shot img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transition:transform .7s var(--ease),filter .7s var(--ease)}
@@ -396,11 +396,11 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--paste
 /* selected work carousel */
 .works{background:linear-gradient(180deg,transparent,#ffffff55 50%,transparent)}
 .works .head p{color:var(--soft)}
-.wc,.pc,.pj-shot{background:var(--card);border:1px solid #fff;box-shadow:inset 0 1px 0 #fff,var(--shadow)}
+.pc,.pj-shot{background:var(--card);border:1px solid #fff;box-shadow:inset 0 1px 0 #fff,var(--shadow)}
 .wc .shot,.pc .shot{background:#dfe3f7}
 .wc{filter:none!important}
 .wc .tag{background:#ffffffd9;box-shadow:0 4px 12px -6px #5a64b8}
-.wc p,.pc p,.wc .row span{color:var(--mute)}
+.pc p{color:var(--mute)}
 .arrow{background:#ffffffc8;border:0;color:var(--ink);box-shadow:inset 0 0 0 1px #fff,0 10px 24px -12px #5a64b8}
 .arrow:hover{background:var(--send);color:#fff}
 .dots button{background:#7b7cff33}.dots button.on{background:var(--send)}

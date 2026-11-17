@@ -300,15 +300,15 @@
   };
   const buildGate = () => {
     gate = document.createElement('div');
-    gate.className = 'nd'; gate.setAttribute('role', 'dialog'); gate.setAttribute('aria-modal', 'true'); gate.setAttribute('aria-label', C.live ? 'Continue your chat' : 'Tell us your name');
+    gate.className = 'nd'; gate.setAttribute('role', 'dialog'); gate.setAttribute('aria-modal', 'true'); gate.setAttribute('aria-label', C.live ? 'Start a conversation' : 'Tell us your name');
     gate.innerHTML = `
 <div class="nd-scrim"></div>
 <form class="nd-card" novalidate>
   <button class="ic-btn nd-x" type="button" data-nd="close" aria-label="Close">${i.close}</button>
   <div class="orbx" aria-hidden="true"><b><s></s><s></s></b><i></i></div>
   <p class="nd-hi">Hello 👋</p>
-  <h3>${C.live ? 'Continue your chat' : 'What should I call you?'}</h3>
-  <p class="nd-sub" data-gate-sub>${C.live ? 'Enter your name and email. We’ll send a secure sign-in link so you can continue this chat on any device.' : `Tell ${own.name || 'me'} your name and we’ll start chatting.`}</p>
+  <h3 data-gate-title>${C.live ? 'Start a conversation' : 'What should I call you?'}</h3>
+  <p class="nd-sub" data-gate-sub>${C.live ? 'New here? Add your name and email to start. Verify your email to keep your chat available on any device and reconnect with past conversations.' : `Tell ${own.name || 'me'} your name and we’ll start chatting.`}</p>
   <label class="nc-name"><span>Your name</span><input data-name maxlength="60" autocomplete="name" placeholder="Your name" enterkeyhint="go"></label>
   ${C.live ? '<label class="nc-name" data-email-field><span>Email address</span><input data-email type="email" maxlength="254" autocomplete="email" placeholder="you@example.com" enterkeyhint="go"></label>' : ''}
   <button class="btn mag nd-submit" type="submit" data-submit>${C.live ? 'Email me a sign-in link' : 'Start chat'}</button>
@@ -402,6 +402,14 @@
         : C.live
           ? 'Enter your name and email. We’ll send a secure sign-in link so you can continue this chat on any device.'
           : `Tell ${own.name || 'me'} your name and we’ll start chatting.`;
+    const gateTitle = $('[data-gate-title]', gate);
+    if (gateTitle) {
+      gateTitle.textContent = gateAuthCode ? 'Verify your email' : visitorReady ? 'Update your chat profile' : C.live ? 'Start a conversation' : 'What should I call you?';
+      gate.setAttribute('aria-label', gateTitle.textContent);
+    }
+    if (!gateAuthCode && !visitorReady && C.live) {
+      $('[data-gate-sub]', gate).textContent = 'New here? Add your name and email to start. Verify your email to keep your chat available on any device and reconnect with past conversations.';
+    }
     if (restoreError) { gateErr.textContent = restoreError; gateErr.hidden = false }
     const nav = $('.nav'); nav && nav.classList.remove('open');
     gate.classList.add('show'); document.documentElement.classList.add('nc-lock');
