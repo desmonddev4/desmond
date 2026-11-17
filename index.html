@@ -44,24 +44,50 @@
 
 <main>
 <header class="hero" id="hero">
-  <h1 class="name disp" aria-label="Desmond Amedzie">
-    <span><i>Desmond</i></span><span><i>Amedzie</i></span>
-  </h1>
-  <div class="stage" data-tilt>
-    <div class="ring"></div>
-    <img class="mark" src="assets/logo-mark.png" alt="Nexus Sync Technologies mark">
-  </div>
   <div class="orb" data-depth="46" style="width:78px;height:78px;left:16%;top:24%"><b></b></div>
   <div class="orb v" data-depth="-60" style="width:54px;height:54px;right:19%;top:20%"><b style="animation-delay:-2s"></b></div>
   <div class="orb c" data-depth="30" style="width:34px;height:34px;right:27%;bottom:26%"><b style="animation-delay:-4s"></b></div>
   <div class="orb" data-depth="-34" style="width:26px;height:26px;left:28%;bottom:22%"><b style="animation-delay:-1s"></b></div>
-  <div class="role">
-    <h2 class="disp">Full-stack developer &amp; <em>UI/UX designer</em></h2>
-    <p>I design clear, intuitive digital experiences and build the systems behind them. CEO of Nexus Sync Technologies.</p>
-  </div>
-  <div class="cta">
-    <a class="btn mag" href="work.html">See the work</a>
-    <a class="btn ghost mag" href="contact.html">Say hello</a>
+  <div class="hero-layout">
+    <div class="hero-copy">
+      <section class="hero-panel" aria-label="Introduction">
+        <h1 class="hero-name disp">Desmond <span>Amedzie</span></h1>
+        <p class="hero-position">UI/UX designer <span>&amp;</span> full-stack developer</p>
+        <p class="hero-lead">I design clear, intuitive experiences and build reliable full-stack and connected products, from first flow to launch.</p>
+        <div class="hero-actions">
+          <a class="btn mag" href="work.html">Explore my work</a>
+          <a class="btn ghost mag" href="contact.html">Start a project</a>
+        </div>
+        <div class="hero-location">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <span><strong>Kumasi, Ghana</strong><small>Founder &amp; CEO, Nexus Sync Technologies</small></span>
+        </div>
+      </section>
+      <div class="hero-services" aria-label="Areas of work">
+        <article class="hero-service">
+          <span class="hero-service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 4v5m8-5v5M7 14h3m4 0h3m-10 3h3"/></svg></span>
+          <span><strong>UI/UX &amp; product design</strong><small>Flows, wireframes, prototypes</small></span>
+        </article>
+        <article class="hero-service">
+          <span class="hero-service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-3-10-2 12"/></svg></span>
+          <span><strong>Web &amp; full-stack</strong><small>Interfaces, APIs, databases</small></span>
+        </article>
+        <article class="hero-service">
+          <span class="hero-service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9m9-9a6.4 6.4 0 0 1 0 9M4.5 4.5a10.6 10.6 0 0 0 0 15m15-15a10.6 10.6 0 0 1 0 15"/></svg></span>
+          <span><strong>Connected systems</strong><small>IoT, dashboards, live data</small></span>
+        </article>
+      </div>
+    </div>
+    <div class="hero-visual" aria-label="Nexus Sync Technologies">
+      <div class="stage" data-tilt>
+        <div class="ring"></div>
+        <img class="mark" src="assets/logo-mark.png" alt="Nexus Sync Technologies mark">
+      </div>
+      <div class="hero-note hero-note-top">
+        <span class="hero-note-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="7"/></svg></span>
+        <span><small>MY APPROACH</small><strong>Design meets engineering</strong></span>
+      </div>
+    </div>
   </div>
   <span class="scroll"></span>
 </header>
@@ -81,13 +107,29 @@
     <div class="btns"><a class="btn mag" href="about.html">My story</a><a class="btn ghost mag" href="contact.html">Start a project</a></div>
   </div>
   <div class="lan">
-    <div class="card" id="card" aria-label="Desmond's ID card. Drag to swing it.">
-      <div class="strap"></div>
-      <div class="body">
-        <img src="assets/logo-mark.png" alt="">
-        <h3 class="disp">Desmond<br>Amedzie</h3>
-        <p>Developer &amp; UI/UX designer<br>CEO, Nexus Sync Technologies</p>
-        <div class="tag">Sense. Connect. Respond.</div>
+    <div class="card" id="card" role="group" tabindex="0" aria-expanded="false" aria-label="Digital contact card. Click or press Enter to reveal the contact QR code. Drag to swing it.">
+      <div class="card-flipper">
+        <div class="card-face card-front">
+          <div class="strap"></div>
+          <div class="body">
+            <img src="assets/logo-mark.png" alt="">
+            <h3 class="disp">Desmond<br>Amedzie</h3>
+            <p>Developer &amp; UI/UX designer<br>CEO, Nexus Sync Technologies</p>
+            <div class="tag">Sense. Connect. Respond.</div>
+            <span class="flip-hint">Tap to reveal contact QR&nbsp; ↻</span>
+          </div>
+        </div>
+        <div class="card-face card-back" aria-hidden="true" inert>
+          <div class="strap"></div>
+          <div class="body">
+            <span class="qr-kicker">SAVE MY CONTACT</span>
+            <img class="contact-qr" src="assets/contact-qr.svg" alt="QR code containing Desmond Amedzie's contact details">
+            <h3 class="disp qr-name">Desmond Amedzie</h3>
+            <p>Scan to add my contact<br><strong>+233 59 148 8699</strong></p>
+            <a class="tag vcard-link" href="contact.vcf" download>Download contact&nbsp; ↓</a>
+            <span class="flip-hint">Tap to turn back&nbsp; ↻</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

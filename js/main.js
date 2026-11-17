@@ -56,11 +56,28 @@
   addEventListener('scroll', () => sy = scrollY, { passive: true });
 
   // lanyard card: spring pendulum, drag to swing
-  const card = $('#card'); let ang = 18, vel = 0, drag = false, tgt = 0;
+  const card = $('#card'); let ang = 18, vel = 0, drag = false, moved = false, startX = 0, startY = 0, tgt = 0;
   const px = e => (e.clientX - (card.parentElement.getBoundingClientRect().left + card.parentElement.offsetWidth / 2));
-  card.addEventListener('pointerdown', e => { drag = true; card.setPointerCapture(e.pointerId) });
-  card.addEventListener('pointermove', e => { if (drag) tgt = Math.max(-40, Math.min(40, px(e) / 5)) });
+  const flipCard = () => {
+    const flipped = card.classList.toggle('is-flipped');
+    card.setAttribute('aria-expanded', String(flipped));
+    card.querySelector('.card-back').setAttribute('aria-hidden', String(!flipped));
+    card.querySelector('.card-back').inert = !flipped;
+    card.querySelector('.card-front').setAttribute('aria-hidden', String(flipped));
+    card.setAttribute('aria-label', flipped ? 'Contact QR code shown. Scan to add Desmond Amedzie. Click or press Enter to turn back.' : 'Digital contact card. Click or press Enter to reveal the contact QR code. Drag to swing it.');
+  };
+  card.addEventListener('pointerdown', e => { if (e.target.closest('a')) return; drag = true; moved = false; startX = e.clientX; startY = e.clientY; card.setPointerCapture(e.pointerId) });
+  card.addEventListener('pointermove', e => { if (drag) { if (Math.hypot(e.clientX - startX, e.clientY - startY) > 8) moved = true; tgt = Math.max(-40, Math.min(40, px(e) / 5)) } });
   card.addEventListener('pointerup', () => { drag = false });
+  card.addEventListener('pointercancel', () => { drag = false; moved = true });
+  card.addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    if (moved) { e.preventDefault(); moved = false; return }
+    flipCard();
+  });
+  card.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('a')) { e.preventDefault(); flipCard() }
+  });
   const swing = new IntersectionObserver(([e]) => { if (e.isIntersecting && !drag) { ang = 24; vel = 0 } }, { threshold: .5 });
   swing.observe(card);
 
@@ -87,7 +104,7 @@
   loop();
 
   // scroll progress + reveals + band velocity + hero fade
-  const prog = $('.prog'), bandTrack = $('.band'), heroEls = [$('.stage'), $('.role'), $('.cta')];
+  const prog = $('.prog'), bandTrack = $('.band'), heroEls = [$('.hero-visual'), $('.hero-panel'), $('.hero-services')];
   $$('.about h2,.about p,.about .btns,.works .head,.works .rail,.works .dots,.talk h2 i,.talk .btn,.glass .cols>div,.rv,.pg-head h1,.pg-head p').forEach((el, k, all) => {
     el.dataset.r = el.matches('h2,h2 i,h1') ? 'mask' : '1';
     el.style.setProperty('--i', el.matches('.pillar,.cols>div,.rv') ? [...el.parentElement.children].indexOf(el) : 0);

@@ -18,6 +18,10 @@ Options -Indexes
   <FilesMatch "\.(png|jpg|webp)$">
     Header set Cache-Control "public, max-age=604800"
   </FilesMatch>
+  <FilesMatch "\.vcf$">
+    Header set Content-Type "text/vcard; charset=utf-8"
+    Header set Content-Disposition "attachment; filename=Desmond-Amedzie.vcf"
+  </FilesMatch>
   <FilesMatch "^(inbox\.html)$">
     Header set Cache-Control "no-store"
     Header set X-Robots-Tag "noindex, nofollow, noarchive"
