@@ -5,14 +5,17 @@
       ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true"
     },
     "chatIndex": {
-      ".read": "auth != null && auth.token.email == 'damedzie4@gmail.com'",
+      ".read": "auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || (auth.token.email_verified == true && query.orderByChild == 'email' && query.equalTo == auth.token.email))",
+      ".indexOn": ["email"],
       "$cid": {
-        ".write": "$cid.length >= 16 && $cid.length <= 40",
+        ".read": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || root.child('chatUsers').child($cid).val() == auth.uid || (auth.token.email_verified == true && (!data.child('email').exists() || data.child('email').val() == auth.token.email)))",
+        ".write": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || (auth.token.email_verified == true && root.child('chatUsers').child($cid).val() == auth.uid && newData.exists()))",
+        ".validate": "newData.hasChildren(['name','lastAt','lastFrom','lastText'])",
         "name": {
           ".validate": "newData.isString() && newData.val().length <= 60"
         },
         "email": {
-          ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 120)"
+          ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 120 && (auth.token.email == 'damedzie4@gmail.com' || (auth.token.email_verified == true && newData.val() == auth.token.email)))"
         },
         "topic": {
           ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 40)"
@@ -21,7 +24,7 @@
           ".validate": "newData.isString() && newData.val().length <= 140"
         },
         "lastFrom": {
-          ".validate": "newData.val() == 'v' || newData.val() == 'a'"
+          ".validate": "newData.val() == 'v' || (newData.val() == 'a' && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true)"
         },
         "lastAt": {
           ".validate": "newData.isNumber()"
@@ -31,16 +34,39 @@
         }
       }
     },
+    "chatUsers": {
+      "$cid": {
+        ".read": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || data.val() == auth.uid)",
+        ".write": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || (auth.token.email_verified == true && newData.val() == auth.uid && (!data.exists() || data.val() == auth.uid || !root.child('chatIndex').child($cid).child('email').exists() || root.child('chatIndex').child($cid).child('email').val() == auth.token.email)))",
+        ".validate": "newData.isString() && newData.val().length > 0"
+      }
+    },
+    "visitorChats": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid == $uid || (auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true))",
+        ".write": "auth != null && auth.token.email_verified == true && (auth.uid == $uid || auth.token.email == 'damedzie4@gmail.com') && newData.exists()",
+        ".validate": "newData.hasChildren(['cid'])",
+        "cid": {
+          ".validate": "newData.isString() && root.child('chatUsers').child(newData.val()).val() == auth.uid"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "chats": {
       "$cid": {
-        ".read": "$cid.length >= 16 && $cid.length <= 40",
+        ".read": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || root.child('chatUsers').child($cid).val() == auth.uid)",
         ".write": "auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true",
         "msgs": {
           "$k": {
-            ".write": "$cid.length >= 16 && $cid.length <= 40 && !data.exists()",
+            ".write": "$cid.length >= 16 && $cid.length <= 40 && auth != null && !data.exists() && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || root.child('chatUsers').child($cid).val() == auth.uid)",
             ".validate": "newData.hasChildren(['from','text','ts'])",
             "from": {
-              ".validate": "newData.val() == 'v' || (newData.val() == 'a' && auth != null && auth.token.email == 'damedzie4@gmail.com')"
+              ".validate": "(newData.val() == 'v' && auth != null && root.child('chatUsers').child($cid).val() == auth.uid) || (newData.val() == 'a' && auth != null && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true)"
             },
             "text": {
               ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 2000"
@@ -55,8 +81,8 @@
         },
         "typing": {
           "$r": {
-            ".write": "$cid.length >= 16 && $cid.length <= 40",
-            ".validate": "($r == 'v' || $r == 'a') && newData.val() == now"
+            ".write": "$cid.length >= 16 && $cid.length <= 40 && auth != null && ((auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true) || root.child('chatUsers').child($cid).val() == auth.uid)",
+            ".validate": "(($r == 'v' && root.child('chatUsers').child($cid).val() == auth.uid) || ($r == 'a' && auth.token.email == 'damedzie4@gmail.com' && auth.token.email_verified == true)) && newData.val() == now"
           }
         }
       }

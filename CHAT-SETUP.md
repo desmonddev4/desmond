@@ -9,14 +9,15 @@ Until you do this, the chat runs in **demo mode** (messages stay in the same bro
 2. **Build > Realtime Database > Create database** (pick the region closest to Ghana, start in *locked mode*).
 3. Copy the database URL shown at the top (looks like `https://xxxx-default-rtdb.firebaseio.com`).
 
-## 2. Turn on sign-in for you only
-1. **Build > Authentication > Get started > Email/Password > Enable**.
+## 2. Turn on sign-in for you and your clients
+1. **Build > Authentication > Get started > Email/Password**: enable both **Email/Password** and **Email link (passwordless sign-in)**.
 2. **Users > Add user**: email `damedzie4@gmail.com` and a strong password.
 3. Firebase marks admin-created users as unverified. Rules require a verified email. After deploying the site, open `admin/login.html` and try signing in with the account. The site sends a verification email automatically; open the link in your inbox (check spam too), then sign in again. A password-reset link does not verify the email.
+4. In **Authentication > Settings > Authorized domains**, make sure every domain serving the site is listed.
 
 ## 3. Paste the rules
 **Realtime Database > Rules**: replace everything with the contents of `firebase-rules.json` and **Publish**.
-These rules let visitors write only to their own (unguessable) thread, never read anyone else's, and let only your verified email read the inbox and reply.
+These rules let email-verified visitors read and write only their own thread, let them find previous threads by their verified email, and let only your verified email read the full inbox and reply.
 
 ## 4. Connect the site
 Get the **Web API key** from your Firebase project settings. In Vercel, add `NST_FIREBASE_DATABASE_URL` and `NST_FIREBASE_API_KEY` as environment variables for the Production environment. Never paste the key into tracked source files. Configure Vercel's build command as `node tools/build.mjs` and its output directory as `dist`; details are in `DEPLOY.md`.
@@ -29,6 +30,8 @@ Open `admin/projects.html` and press **Add project**. Fill in the name, category
 - **Demo mode:** projects are saved in the same browser as the admin, which is enough to try it out.
 
 ## Good to know
+- Live chat asks clients for their name and email, then sends a one-time sign-in link. Opening that link verifies their email and resumes their most recent conversation on that browser. On another browser or device, they must enter the same email again when opening the link; the email is not put in the link URL.
+- Existing conversations with a saved email can be claimed after that email is verified. Older conversations without an email can only be claimed on the browser that still has the conversation ID.
 - **You only get alerts while the inbox tab is open** (sound, tab title count, and desktop notifications once you click "Enable alerts"). On your phone, open `inbox.html` and "Add to Home Screen". True background push needs a server function later.
 - Toggle **Show me as available** off when you're away: visitors then see "Away" plus an email box and the WhatsApp link.
 - The inbox page is not linked from the site and is marked `noindex`; it also requires the admin sign-in.

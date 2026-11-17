@@ -21,7 +21,7 @@
     t: r.t || 'Untitled project', tag: r.tag || 'Frontend', d: r.d || '', img: r.img || '', src: r.thumb || '',
     client: r.client || '', role: r.role || '', year: r.year || String(new Date().getFullYear()),
     stack: Array.isArray(r.stack) ? r.stack : String(r.stack || '').split(',').map(s => s.trim()).filter(Boolean),
-    live: r.live || '', brief: r.brief || '', built: r.built || '', result: r.result || ''
+    live: r.live || '', prototypeUrl: r.prototypeUrl || '', brief: r.brief || '', built: r.built || '', result: r.result || ''
   });
   const fromTree = tree => Object.entries(tree || {}).map(([id, r]) => shape(id, r || {})).sort((a, b) => b.created - a.created);
 

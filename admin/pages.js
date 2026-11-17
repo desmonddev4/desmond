@@ -109,7 +109,7 @@
 
   /* ============ Projects ============ */
   let pjTag = 'All';
-  const CATS = ['E-commerce', 'Frontend', 'Motion', 'Full stack', 'Mobile app', 'Backend and API', 'IoT'];
+  const CATS = ['E-commerce', 'Frontend', 'Motion', 'Full stack', 'Mobile app', 'Backend and API', 'IoT', 'UI/UX Design'];
   const field = (id, label, html, hint) => `<label class="fld" for="${id}"><span>${label}</span>${html}${hint ? `<em>${hint}</em>` : ''}</label>`;
 
   /* the Add / Edit window */
@@ -141,15 +141,16 @@
           ${field('f-st', 'Status', `<select id="f-st" name="status">${PROJ.map(p => `<option${(rec.status || 'Shipped') === p ? ' selected' : ''}>${p}</option>`).join('')}</select>`)}
           ${field('f-live', 'Live link', `<input id="f-live" name="live" type="url" inputmode="url" maxlength="300" placeholder="https://example.com" value="${x.esc(rec.live || '')}">`, 'Leave empty to hide the “Visit live site” button.')}
         </div>
-        <details class="more" ${rec.brief || rec.built || rec.result || rec.client ? 'open' : ''}><summary>Case study details <small>optional, fills the project page</small></summary>
+        ${field('f-prototype', 'Prototype or design link', `<input id="f-prototype" name="prototypeUrl" type="url" inputmode="url" maxlength="300" placeholder="https://..." value="${x.esc(rec.prototypeUrl || '')}">`, 'Optional. Add a public prototype or design handoff link.')}
+        <details class="more" ${rec.brief || rec.built || rec.result || rec.client || rec.prototypeUrl ? 'open' : ''}><summary>Case study details <small>optional, fills the project page</small></summary>
           <div class="fgrid">
             ${field('f-c', 'Client', `<input id="f-c" name="client" maxlength="90" value="${x.esc(rec.client || '')}">`)}
             ${field('f-r', 'Your role', `<input id="f-r" name="role" maxlength="90" placeholder="Frontend development" value="${x.esc(rec.role || '')}">`)}
             ${field('f-y', 'Year', `<input id="f-y" name="year" maxlength="9" inputmode="numeric" value="${x.esc(rec.year || new Date().getFullYear())}">`)}
-            ${field('f-s', 'Built with', `<input id="f-s" name="stack" maxlength="160" placeholder="HTML, CSS, JavaScript" value="${x.esc(Array.isArray(rec.stack) ? rec.stack.join(', ') : rec.stack || '')}">`, 'Separate with commas.')}
+            ${field('f-s', 'Tools and methods', `<input id="f-s" name="stack" maxlength="160" placeholder="Design tools, frameworks, methods" value="${x.esc(Array.isArray(rec.stack) ? rec.stack.join(', ') : rec.stack || '')}">`, 'Separate with commas.')}
           </div>
           ${field('f-b', 'The brief', `<textarea id="f-b" name="brief" rows="3" maxlength="700" placeholder="What did the client need?">${x.esc(rec.brief || '')}</textarea>`)}
-          ${field('f-w', 'What I built', `<textarea id="f-w" name="built" rows="3" maxlength="700" placeholder="What did you make?">${x.esc(rec.built || '')}</textarea>`)}
+          ${field('f-w', 'What I designed or built', `<textarea id="f-w" name="built" rows="3" maxlength="700" placeholder="What did you design or build?">${x.esc(rec.built || '')}</textarea>`)}
           ${field('f-res', 'The result', `<textarea id="f-res" name="result" rows="3" maxlength="500" placeholder="What changed for the client?">${x.esc(rec.result || '')}</textarea>`)}
         </details>
         <p class="ferr" role="alert" hidden></p>
@@ -183,15 +184,16 @@
     });
     form.addEventListener('submit', async e => {
       e.preventDefault(); if (busy) return;
-      const g = n => form.elements[n].value.trim(), t = g('t'), tag = g('tag'), d = g('d'), live = g('live');
+      const g = n => form.elements[n].value.trim(), t = g('t'), tag = g('tag'), d = g('d'), live = g('live'), prototypeUrl = g('prototypeUrl');
       if (!t) return fail('Give the project a name.', form.elements.t);
       if (!tag) return fail('Pick a category or type a new one.', form.elements.tag);
       if (!d) return fail('Add a short description.', form.elements.d);
       if (!thumb) return fail('Add a cover image.', drop);
       if (live && !/^https?:\/\//i.test(live)) return fail('The live link must start with http:// or https://', form.elements.live);
+      if (prototypeUrl && !/^https?:\/\//i.test(prototypeUrl)) return fail('The prototype link must start with http:// or https://', form.elements.prototypeUrl);
       const stack = g('stack').split(',').map(s => s.trim()).filter(Boolean).slice(0, 12);
       if (stack.some(s => s.length > 40)) return fail('Each technology name must be 40 characters or fewer.', form.elements.stack);
-      const next = { ...rec, t, tag, d, img: '', thumb, status: g('status'), live, client: g('client'), role: g('role'), year: g('year') || String(new Date().getFullYear()),
+      const next = { ...rec, t, tag, d, img: '', thumb, status: g('status'), live, prototypeUrl, client: g('client'), role: g('role'), year: g('year') || String(new Date().getFullYear()),
         stack, brief: g('brief'), built: g('built'), result: g('result') };
       busy = true; err.hidden = true; const go = $('[data-go]'); go.textContent = 'Saving…'; form.querySelector('.fill').disabled = true;
       try { await P.save(editing ? id : null, next, full); x.toast(editing ? 'Project updated' : 'Project added. It is live on your site.'); close() }

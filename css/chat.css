@@ -321,8 +321,13 @@ button.ct{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer;p
 .nd-card h3{font:800 clamp(24px,4dvh,30px)/1.15 var(--body);margin:4px 0 6px;letter-spacing:-.01em}
 .nd-sub{font-size:14px;color:var(--mute);max-width:30ch}
 .nd .nc-name{padding:5px 5px 5px 20px;margin-top:20px;position:relative}
+.nd .nc-name[hidden]{display:none}
 .nd .nc-name input{padding:10px 0;outline:none!important}
 .nd .send{margin-left:8px}
+.nd-submit{width:100%;justify-content:center;margin-top:16px}
+.nd-submit:disabled{opacity:.55;cursor:wait}
+.nd-hint{margin-top:10px;font-size:12.5px;font-weight:700;color:#386b57}
+.nd-hint[hidden]{display:none}
 .nd-err{margin-top:10px;font-size:12.5px;font-weight:700;color:#d6336c}
 @media(max-width:860px){
   .nd{place-items:end center;padding:0}

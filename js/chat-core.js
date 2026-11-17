@@ -18,16 +18,38 @@
   const stClear = () => { try { localStorage.removeItem(RT); sessionStorage.removeItem(RT) } catch {} };
   const inSession = () => { try { return !localStorage.getItem(RT) && !!sessionStorage.getItem(RT) } catch { return false } };
   refresh = stGet();
+  const VRT = 'nst_visitor_rt';
+  let visitorToken = null, visitorRefresh = null, visitorTimer = 0;
+  const visitorStGet = () => { try { return localStorage.getItem(VRT) || sessionStorage.getItem(VRT) } catch { return null } };
+  const visitorStSet = rt => { try { localStorage.setItem(VRT, rt) } catch {} };
+  const visitorStClear = () => { try { localStorage.removeItem(VRT); sessionStorage.removeItem(VRT) } catch {} };
+  visitorRefresh = visitorStGet();
   const OWNER = String(((cfg.owner || {}).email) || '').toLowerCase();
   const jwt = t => { try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) } catch { return {} } };
-  const u = (p, q) => { const s = new URLSearchParams(q || {}); if (token) s.set('auth', token); const t = s.toString(); return `${db}/${p}.json${t ? '?' + t : ''}` };
-  const call = async (method, p, body, keepalive) => {
-    const r = await fetch(u(p), { method, body: body === undefined ? undefined : JSON.stringify(body), keepalive: !!keepalive });
-    if (!r.ok) throw new Error('http ' + r.status);
-    return r.json();
+  const u = (p, q, authToken = token) => { const s = new URLSearchParams(q || {}); if (authToken) s.set('auth', authToken); const t = s.toString(); return `${db}/${p}.json${t ? '?' + t : ''}` };
+  const call = async (method, p, body, keepalive, authToken = token, query) => {
+    const r = await fetch(u(p, query, authToken), { method, body: body === undefined ? undefined : JSON.stringify(body), keepalive: !!keepalive });
+    let data = null;
+    try { data = await r.json() } catch (e) { if (r.ok) throw e }
+    if (!r.ok) {
+      const code = String((data && data.error) || ('HTTP_' + r.status));
+      const error = new Error(code); error.status = r.status; error.code = code; throw error;
+    }
+    return data;
+  };
+  const authPost = async (method, body) => {
+    const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${method}?key=${fb.apiKey}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      const code = String((data.error && data.error.message) || ('HTTP_' + r.status));
+      const error = new Error(code); error.status = r.status; error.code = code; throw error;
+    }
+    return data;
   };
   // Mirrors a database path into a local tree and calls on(tree) after every server event.
-  const mirror = (p, on, conn) => {
+  const mirror = (p, on, conn, auth = () => token) => {
     let es, dead = false, tree = null, retry;
     const put = (path, data) => {
       if (path === '/' || path === '') { tree = data; return }
@@ -40,7 +62,7 @@
     };
     const open = () => {
       if (dead) return;
-      es = new EventSource(u(p));
+      es = new EventSource(u(p, undefined, typeof auth === 'function' ? auth() : auth));
       es.onopen = () => conn && conn(true);
       es.onerror = () => conn && conn(false);
       es.addEventListener('put', e => { const d = JSON.parse(e.data); put(d.path, d.data); on(tree || {}) });
@@ -54,16 +76,16 @@
 
   const liveVisitor = cid => ({
     start(h) {
-      const a = mirror(`chats/${cid}`, t => { h.msgs(list(t.msgs)); h.typing((t.typing && t.typing.a) || 0) }, h.conn);
+      const a = mirror(`chats/${cid}`, t => { h.msgs(list(t.msgs)); h.typing((t.typing && t.typing.a) || 0) }, h.conn, () => visitorToken);
       const b = mirror('owner', t => h.owner(t));
       return () => { a(); b() };
     },
     async send(m, info) {
-      await call('PUT', `chats/${cid}/msgs/${m.k}`, { from: 'v', text: m.text, ts: SV });
-      await call('PATCH', `chatIndex/${cid}`, { name: info.name, email: info.email || null, topic: info.topic || null, lastAt: SV, lastFrom: 'v', lastText: m.text.slice(0, 140) });
+      await call('PUT', `chats/${cid}/msgs/${m.k}`, { from: 'v', text: m.text, ts: SV }, false, visitorToken);
+      await call('PATCH', `chatIndex/${cid}`, { name: info.name, email: info.email, topic: info.topic || null, lastAt: SV, lastFrom: 'v', lastText: m.text.slice(0, 140) }, false, visitorToken);
     },
-    typing() { call('PUT', `chats/${cid}/typing/v`, SV).catch(() => {}) },
-    saveContact(info) { return call('PATCH', `chatIndex/${cid}`, info) }
+    typing() { call('PUT', `chats/${cid}/typing/v`, SV, false, visitorToken).catch(() => {}) },
+    saveContact(info) { return call('PATCH', `chatIndex/${cid}`, info, false, visitorToken) }
   });
 
   const API_KEY = fb.apiKey;
@@ -79,6 +101,106 @@
     stSet(rt, remember === undefined ? !inSession() : remember);
     clearTimeout(tokenTimer);
     tokenTimer = setTimeout(refreshSession, Math.max(60, (+expires || 3600) - 120) * 1000);
+  };
+  const visitorInfo = () => {
+    const claims = jwt(visitorToken);
+    return {
+      uid: String(claims.user_id || claims.sub || ''),
+      email: String(claims.email || '').trim().toLowerCase(),
+      emailVerified: claims.email_verified === true
+    };
+  };
+  const clearVisitor = () => {
+    visitorToken = null; visitorRefresh = null; visitorStClear(); clearTimeout(visitorTimer);
+  };
+  const applyVisitorToken = (idToken, rt, expires) => {
+    visitorToken = idToken; visitorRefresh = rt; visitorStSet(rt);
+    clearTimeout(visitorTimer);
+    visitorTimer = setTimeout(retryVisitorRefresh, Math.max(60, (+expires || 3600) - 120) * 1000);
+  };
+  const refreshVisitor = async () => {
+    if (!visitorRefresh) return;
+    const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${fb.apiKey}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(visitorRefresh)}`
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      const error = new Error((data.error && data.error.message) || 'Visitor sign-in refresh failed');
+      error.dead = r.status >= 400 && r.status < 500 && r.status !== 429;
+      throw error;
+    }
+    applyVisitorToken(data.id_token, data.refresh_token, data.expires_in);
+  };
+  const retryVisitorRefresh = () => {
+    refreshVisitor().catch(error => {
+      if (error && error.dead) { clearVisitor(); return }
+      visitorTimer = setTimeout(retryVisitorRefresh, 30000);
+    });
+  };
+  const visitorSession = {
+    async restore() {
+      if (!visitorRefresh) return null;
+      try { await refreshVisitor() }
+      catch (error) {
+        if (error && error.dead) { clearVisitor(); return null }
+        throw error;
+      }
+      const info = visitorInfo();
+      return info.uid && info.emailVerified ? info : null;
+    },
+    async sendLink(email, continueUrl) {
+      const normalized = String(email || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error('INVALID_EMAIL');
+      await authPost('sendOobCode', {
+        requestType: 'EMAIL_SIGNIN', email: normalized, continueUrl, canHandleCodeInApp: true
+      });
+    },
+    async finishLink(email, oobCode) {
+      const normalized = String(email || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new Error('INVALID_EMAIL');
+      const data = await authPost('signInWithEmailLink', { email: normalized, oobCode });
+      applyVisitorToken(data.idToken, data.refreshToken, data.expiresIn);
+      const info = visitorInfo();
+      if (!info.uid || !info.emailVerified) { clearVisitor(); throw new Error('EMAIL_NOT_VERIFIED') }
+      return info;
+    },
+    async resume(currentCid, name) {
+      const info = visitorInfo();
+      if (!info.uid || !info.emailVerified) throw new Error('EMAIL_NOT_VERIFIED');
+      const saved = await call('GET', `visitorChats/${info.uid}`, undefined, false, visitorToken);
+      let cid = saved && saved.cid ? String(saved.cid) : '';
+      let priorName = saved && saved.name ? String(saved.name) : '';
+      if (!cid) {
+        const found = await call('GET', 'chatIndex', undefined, false, visitorToken, {
+          orderBy: '"email"', equalTo: JSON.stringify(info.email)
+        });
+        const matches = Object.entries(found || {}).map(([id, row]) => ({ cid: id, ...row }))
+          .sort((a, b) => (Number(b.lastAt) || 0) - (Number(a.lastAt) || 0));
+        if (matches.length) {
+          cid = matches[0].cid;
+          priorName = matches[0].name || '';
+        }
+      }
+      if (!cid && currentCid) {
+        try {
+          const previous = await call('GET', `chatIndex/${currentCid}`, undefined, false, visitorToken);
+          if (!previous || !previous.email || String(previous.email).trim().toLowerCase() === info.email) {
+            cid = currentCid;
+            priorName = previous && previous.name || '';
+          }
+        } catch (error) {
+          if (error.status !== 401 && error.status !== 403) throw error;
+        }
+      }
+      if (!cid) cid = rnd(24);
+      const displayName = String(name || priorName || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      if (!displayName) throw new Error('MISSING_NAME');
+      await call('PUT', `chatUsers/${cid}`, info.uid, false, visitorToken);
+      await call('PUT', `visitorChats/${info.uid}`, { cid, name: displayName }, false, visitorToken);
+      return { cid, name: displayName, email: info.email };
+    },
+    logout() { clearVisitor() }
   };
   const doRefresh = async () => {
     const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refresh)}` });
@@ -168,6 +290,7 @@
 
   window.NSTCore = {
     live, local, misconfigured, rnd, newKey, token: () => token,
+    visitorAuth: visitorSession,
     authInfo: () => {
       const c = jwt(token);
       return { email: String(c.email || ''), emailVerified: c.email_verified === true, projectId: String(c.aud || '') };

@@ -25,6 +25,7 @@ const draw=()=>{
   $('#ms').innerHTML=(w.stack||[]).map(s=>'<span class="chip">'+esc(s)+'</span>').join('');
   $('#sb').textContent=w.brief||w.d;$('#sw').textContent=w.built||'';$('#sr').textContent=w.result||'';
   const lv=safeLink(w.live),a=$('#live');if(lv){a.href=lv;a.style.display=''}else{a.style.display='none'}
+  const pv=safeLink(w.prototypeUrl),pa=$('#prototype');if(pv){pa.href=pv;pa.style.display=''}else{pa.style.display='none'}
   const n=(o,l)=>{const x=W[(id+o+W.length)%W.length];return '<a class="pnc" href="project.html?id='+encodeURIComponent(x.id)+'"><img src="'+esc(NSTProjects.imgOf(x))+'" alt=""><span><small>'+l+'</small><b>'+esc(x.t)+'</b></span></a>'};
   $('#pn').innerHTML=n(-1,'Previous project')+n(1,'Next project');
 };
